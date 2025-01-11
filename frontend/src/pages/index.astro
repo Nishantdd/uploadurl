@@ -1,0 +1,18 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Header from '@/components/Header.astro';
+import UrlShortener from '@/components/UrlShortener.astro';
+import FileUploader from '@/components/FileUploader.astro';
+---
+
+<Layout>
+    <main class="min-h-screen">
+        <div class="container mx-auto px-56">
+			<Header />
+			<div class="container mx-auto px-24 py-10 space-y-10">
+				<UrlShortener />
+				<FileUploader />
+			</div>
+        </div>
+    </main>
+</Layout>

@@ -1,0 +1,41 @@
+---
+import Layout from "@/layouts/Layout.astro";
+---
+
+<Layout>
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="text-center space-y-8">
+            <h1 class="text-9xl font-bold gradient-text animate-float">404</h1>
+            <p class="text-2xl text-gray-600 dark:text-gray-400">Oops! Page not found</p>
+            <a href="/" class="inline-block px-6 py-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg hover:scale-105 transition-transform duration-200 ease-in-out">
+                Go Home
+            </a>
+        </div>
+    </div>
+
+    <style>
+        .gradient-text {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient 15s ease infinite;
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+</Layout>
