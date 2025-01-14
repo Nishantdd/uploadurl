@@ -2,10 +2,11 @@ package models
 
 type Url struct {
 	Model
-	OriginalUrl string `gorm:"type:text" json:"original_url"`
-	ShortUrl    string `gorm:"type:text" json:"short_url"`
-	Slug        string `gorm:"type:text" json:"slug"`
-	Username    string `gorm:"type:varchar(100)" json:"username" binding:"max=100"`
-	Type        string `gorm:"type:varchar(8)" json:"type"`
-	UserId      uint64 `json:"user_id"`
+	OriginalUrl string  `gorm:"type:text;not null" json:"original_url"`
+	ShortUrl    string  `gorm:"type:text;not null;unique" json:"short_url"`
+	Type        string  `gorm:"type:varchar(8);default:'url'" json:"type"`
+	UserId      uint64  `gorm:"not null" json:"user_id"`
+	User        User    `gorm:"foreignKey:UserId" json:"-"`
+	Files       []Files `gorm:"foreignKey:UrlId" json:"files,omitempty"` // One-to-Many
+	Slug        *Slug   `gorm:"foreignKey:UrlId" json:"slug,omitempty"`  // One-to-One
 }

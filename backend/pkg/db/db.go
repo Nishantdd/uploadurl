@@ -9,18 +9,18 @@ import (
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
-
-func SetupConnection() {
+func SetupConnection() *gorm.DB {
 	cfg := config.Load()
 
-	DB, err := gorm.Open(postgres.Open(cfg.Postgres.URI), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(cfg.Postgres.URI), &gorm.Config{})
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	// migrating Models/Schemas
-	if err := DB.AutoMigrate(&models.User{}, &models.Url{}, &models.Slug{}, &models.Files{}); err != nil {
+	if err := db.AutoMigrate(&models.User{}, &models.Url{}, &models.Slug{}, &models.Files{}); err != nil {
 		log.Fatalln("Failed to migrate database:", err)
 	}
+
+	return db
 }

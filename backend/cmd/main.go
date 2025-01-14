@@ -11,7 +11,7 @@ import (
 
 func main() {
 	cfg := config.Load()
-	db.SetupConnection()
+	config.DB = db.SetupConnection()
 
 	router := gin.Default()
 	routes.HandleRoutes(router)

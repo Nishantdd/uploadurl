@@ -3,15 +3,15 @@ package controllers
 import (
 	"net/http"
 
+	"github.com/Nishantdd/uploadurl/backend/config"
 	"github.com/Nishantdd/uploadurl/backend/internals/models"
-	"github.com/Nishantdd/uploadurl/backend/pkg/db"
 	"github.com/gin-gonic/gin"
 )
 
 func GetUsers(c *gin.Context) {
 	var users []models.User
 
-	if err := db.DB.Find(&users).Error; err != nil {
+	if err := config.DB.Find(&users).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -27,7 +27,7 @@ func GetUserByID(c *gin.Context) {
 		return
 	}
 
-	if err := db.DB.First(&user, id).Error; err != nil {
+	if err := config.DB.First(&user, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
@@ -43,7 +43,7 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	result := db.DB.Create(&user)
+	result := config.DB.Create(&user)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
@@ -61,7 +61,7 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	// Check if user exists
-	if err := db.DB.First(&user, id).Error; err != nil {
+	if err := config.DB.First(&user, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
@@ -73,7 +73,7 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	// Update user
-	result := db.DB.Save(&user)
+	result := config.DB.Save(&user)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
@@ -89,7 +89,7 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 
-	result := db.DB.Delete(&models.User{}, id)
+	result := config.DB.Delete(&models.User{}, id)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
