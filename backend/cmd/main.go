@@ -4,14 +4,14 @@ import (
 	"log"
 
 	"github.com/Nishantdd/uploadurl/backend/config"
+	"github.com/Nishantdd/uploadurl/backend/internals/database"
 	"github.com/Nishantdd/uploadurl/backend/internals/routes"
-	"github.com/Nishantdd/uploadurl/backend/pkg/db"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	cfg := config.Load()
-	config.DB = db.SetupConnection()
+	config.DB = database.SetupConnection()
 
 	router := gin.Default()
 	routes.HandleRoutes(router)
