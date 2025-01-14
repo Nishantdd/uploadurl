@@ -11,14 +11,10 @@ import (
 
 func main() {
 	cfg := config.Load()
-
 	db.SetupConnection()
-	if db.DB == nil {
-		log.Fatalf("Failed to connect to database")
-	}
 
 	router := gin.Default()
-	routes.UserRoutes(router)
+	routes.HandleRoutes(router)
 
 	if err := router.Run(cfg.Server.Address); err != nil {
 		log.Fatalf("Failed to start server: %v", err)

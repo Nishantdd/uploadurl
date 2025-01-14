@@ -24,7 +24,3 @@ func SetupConnection() {
 		log.Fatalln("Failed to migrate database:", err)
 	}
 }
-
-func GetDB() *gorm.DB {
-	return DB
-}
