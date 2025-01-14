@@ -15,6 +15,7 @@ type Config struct {
 	Postgres PostgresConfig
 	Redis    RedisConfig
 	AWS      AWSConfig
+	JWT      JWTConfig
 }
 
 type ServerConfig struct {
@@ -35,6 +36,10 @@ type AWSConfig struct {
 	Region       string
 	AccessKey    string
 	SecretKey    string
+}
+
+type JWTConfig struct {
+	JWTSecret string
 }
 
 func Load() *Config {
@@ -59,6 +64,9 @@ func Load() *Config {
 			Region:       os.Getenv("AWS_REGION"),
 			AccessKey:    os.Getenv("AWS_ACCESS_KEY"),
 			SecretKey:    os.Getenv("AWS_SECRET_KEY"),
+		},
+		JWT: JWTConfig{
+			JWTSecret: os.Getenv("JWT_SECRET"),
 		},
 	}
 }

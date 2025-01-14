@@ -5,6 +5,7 @@ import (
 
 	"github.com/Nishantdd/uploadurl/backend/config"
 	"github.com/Nishantdd/uploadurl/backend/internals/models"
+	"github.com/Nishantdd/uploadurl/backend/internals/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,6 +17,9 @@ func GetUsers(c *gin.Context) {
 		return
 	}
 
+	for i := range users {
+		users[i].Password = ""
+	}
 	c.JSON(http.StatusOK, gin.H{"users": users})
 }
 
@@ -32,6 +36,7 @@ func GetUserByID(c *gin.Context) {
 		return
 	}
 
+	user.Password = "" // prevention from sending password
 	c.JSON(http.StatusOK, gin.H{"user": user})
 }
 
@@ -43,12 +48,21 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
+	// Hashing password
+	var err error
+	user.Password, err = utils.HashPassword(user.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+		return
+	}
+
 	result := config.DB.Create(&user)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
 	}
 
+	user.Password = "" // prevention from sending password
 	c.JSON(http.StatusCreated, gin.H{"user": user})
 }
 
@@ -72,6 +86,14 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
+	// Hashing password
+	var err error
+	user.Password, err = utils.HashPassword(user.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+		return
+	}
+
 	// Update user
 	result := config.DB.Save(&user)
 	if result.Error != nil {
@@ -79,6 +101,7 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
+	user.Password = "" // prevention from sending password
 	c.JSON(http.StatusOK, gin.H{"user": user})
 }
 
