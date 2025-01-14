@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/Nishantdd/uploadurl/backend/config"
@@ -22,4 +23,30 @@ func GenerateJWT(userID uint) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+func ValidateJWT(tokenString string) (jwt.MapClaims, error) {
+	secret := []byte(config.Load().JWT.JWTSecret)
+
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if token.Method != jwt.SigningMethodHS256 {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return secret, nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !token.Valid {
+		return nil, fmt.Errorf("invalid token")
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return nil, fmt.Errorf("invalid token claims")
+	}
+
+	return claims, nil
 }
