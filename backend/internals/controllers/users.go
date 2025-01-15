@@ -3,7 +3,7 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/Nishantdd/uploadurl/backend/config"
+	"github.com/Nishantdd/uploadurl/backend/internals/database"
 	"github.com/Nishantdd/uploadurl/backend/internals/models"
 	"github.com/Nishantdd/uploadurl/backend/internals/utils"
 	"github.com/gin-gonic/gin"
@@ -12,7 +12,7 @@ import (
 func GetUsers(c *gin.Context) {
 	var users []models.User
 
-	if err := config.DB.Find(&users).Error; err != nil {
+	if err := database.DB.Find(&users).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -31,7 +31,7 @@ func GetUserByID(c *gin.Context) {
 		return
 	}
 
-	if err := config.DB.First(&user, id).Error; err != nil {
+	if err := database.DB.First(&user, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
@@ -56,7 +56,7 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	result := config.DB.Create(&user)
+	result := database.DB.Create(&user)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
@@ -75,7 +75,7 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	// Check if user exists
-	if err := config.DB.First(&user, id).Error; err != nil {
+	if err := database.DB.First(&user, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
@@ -95,7 +95,7 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	// Update user
-	result := config.DB.Save(&user)
+	result := database.DB.Save(&user)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
@@ -112,7 +112,7 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 
-	result := config.DB.Delete(&models.User{}, id)
+	result := database.DB.Delete(&models.User{}, id)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return

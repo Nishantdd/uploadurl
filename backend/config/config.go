@@ -5,10 +5,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"gorm.io/gorm"
 )
-
-var DB *gorm.DB
 
 type Config struct {
 	Server   ServerConfig
