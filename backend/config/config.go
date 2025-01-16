@@ -12,6 +12,7 @@ type Config struct {
 	Redis    RedisConfig
 	AWS      AWSConfig
 	JWT      JWTConfig
+	OAuth    OAuthConfig
 }
 
 type ServerConfig struct {
@@ -38,6 +39,13 @@ type JWTConfig struct {
 	JWTSecret string
 }
 
+type OAuthConfig struct {
+	OAuthSecret  string
+	RedirectURL  string
+	CredFilePath string
+	SessionName  string
+}
+
 func Load() *Config {
 	return &Config{
 		Server: ServerConfig{
@@ -58,6 +66,12 @@ func Load() *Config {
 		},
 		JWT: JWTConfig{
 			JWTSecret: os.Getenv("JWT_SECRET"),
+		},
+		OAuth: OAuthConfig{
+			OAuthSecret:  os.Getenv("OAUTH_SECRET"),
+			RedirectURL:  os.Getenv("REDIRECT_URL"),
+			CredFilePath: os.Getenv("CREDFILE_PATH"),
+			SessionName:  os.Getenv("SESSION_NAME"),
 		},
 	}
 }
