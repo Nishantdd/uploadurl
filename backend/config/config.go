@@ -1,10 +1,9 @@
 package config
 
 import (
-	"log"
 	"os"
 
-	"github.com/joho/godotenv"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 type Config struct {
@@ -40,11 +39,6 @@ type JWTConfig struct {
 }
 
 func Load() *Config {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
 	return &Config{
 		Server: ServerConfig{
 			Address: os.Getenv("SERVER_ADDRESS"),

@@ -6,6 +6,7 @@ import (
 	"github.com/Nishantdd/uploadurl/backend/config"
 	"github.com/Nishantdd/uploadurl/backend/internals/database"
 	"github.com/Nishantdd/uploadurl/backend/internals/routes"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,6 +15,12 @@ func main() {
 	database.DB = database.SetupConnection()
 
 	router := gin.Default()
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
+		AllowHeaders:     []string{"Accept", "Authorization", "Content-Type"},
+		AllowCredentials: true,
+	}))
 	routes.HandleRoutes(router)
 
 	if err := router.Run(cfg.Server.Address); err != nil {
