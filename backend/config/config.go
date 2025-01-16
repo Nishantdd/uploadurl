@@ -12,6 +12,7 @@ type Config struct {
 	Redis    RedisConfig
 	AWS      AWSConfig
 	JWT      JWTConfig
+	OAuth    OAuthConfig
 }
 
 type ServerConfig struct {
@@ -38,6 +39,12 @@ type JWTConfig struct {
 	JWTSecret string
 }
 
+type OAuthConfig struct {
+	GoogleClientID     string
+	GoogleClientSecret string
+	RedirectURL        string
+}
+
 func Load() *Config {
 	return &Config{
 		Server: ServerConfig{
@@ -58,6 +65,11 @@ func Load() *Config {
 		},
 		JWT: JWTConfig{
 			JWTSecret: os.Getenv("JWT_SECRET"),
+		},
+		OAuth: OAuthConfig{
+			GoogleClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
+			GoogleClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+			RedirectURL:        os.Getenv("OAUTH_REDIRECT_URL"),
 		},
 	}
 }

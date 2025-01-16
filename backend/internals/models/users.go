@@ -15,3 +15,9 @@ type UserWithPassword struct {
 	Email    string `json:"email" binding:"required,email,max=50"`
 	Password string `json:"password" binding:"required,min=8,max=30"`
 }
+
+type GoogleUserInfo struct {
+	Email   string `json:"email"`
+	Name    string `json:"name"`
+	Picture string `json:"picture"`
+}
