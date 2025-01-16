@@ -6,7 +6,6 @@ import (
 	"github.com/Nishantdd/uploadurl/backend/config"
 	"github.com/Nishantdd/uploadurl/backend/internals/database"
 	"github.com/Nishantdd/uploadurl/backend/internals/routes"
-	"github.com/Nishantdd/uploadurl/backend/internals/service"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -14,8 +13,6 @@ import (
 func main() {
 	cfg := config.Load()
 	database.DB = database.SetupConnection()
-
-	service.Oauth2Config, service.Oauth2State = service.InitOauth()
 
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{

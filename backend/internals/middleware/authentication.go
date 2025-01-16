@@ -1,11 +1,9 @@
 package middleware
 
 import (
-	"encoding/json"
 	"net/http"
 	"strings"
 
-	"github.com/Nishantdd/uploadurl/backend/internals/models"
 	"github.com/Nishantdd/uploadurl/backend/internals/utils"
 	"github.com/gin-gonic/gin"
 )
@@ -41,19 +39,4 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		c.Next()
 	}
-}
-
-func GetGoogleUserInfo(client *http.Client) (*models.GoogleUserInfo, error) {
-	resp, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	var userInfo models.GoogleUserInfo
-	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
-		return nil, err
-	}
-
-	return &userInfo, nil
 }
