@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/Nishantdd/uploadurl/backend/config"
+	"github.com/Nishantdd/uploadurl/backend/internals/auth"
 	"github.com/Nishantdd/uploadurl/backend/internals/database"
 	"github.com/Nishantdd/uploadurl/backend/internals/routes"
 	"github.com/gin-contrib/cors"
@@ -13,6 +14,7 @@ import (
 func main() {
 	cfg := config.Load()
 	database.DB = database.SetupConnection()
+	auth.NewAuth()
 
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{
@@ -23,9 +25,5 @@ func main() {
 	}))
 	routes.HandleRoutes(router)
 
-	if err := router.Run(cfg.Server.Address); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
-	} else {
-		log.Printf("Listening on %v", cfg.Server.Address)
-	}
+	log.Fatal(router.Run(cfg.Server.Address))
 }

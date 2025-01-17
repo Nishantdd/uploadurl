@@ -7,11 +7,16 @@ import (
 )
 
 type Config struct {
+	App      AppConfig
 	Server   ServerConfig
 	Postgres PostgresConfig
 	Redis    RedisConfig
 	AWS      AWSConfig
-	JWT      JWTConfig
+	OAuth    OAuthConfig
+}
+
+type AppConfig struct {
+	Address string
 }
 
 type ServerConfig struct {
@@ -34,14 +39,19 @@ type AWSConfig struct {
 	SecretKey    string
 }
 
-type JWTConfig struct {
-	JWTSecret string
+type OAuthConfig struct {
+	GoogleClientId     string
+	GoogleClientSecret string
+	SessionSecret      string
 }
 
 func Load() *Config {
 	return &Config{
 		Server: ServerConfig{
 			Address: os.Getenv("SERVER_ADDRESS"),
+		},
+		App: AppConfig{
+			Address: os.Getenv("APP_ADDRESS"),
 		},
 		Postgres: PostgresConfig{
 			URI: os.Getenv("DATABASE_URL"),
@@ -56,8 +66,10 @@ func Load() *Config {
 			AccessKey:    os.Getenv("AWS_ACCESS_KEY"),
 			SecretKey:    os.Getenv("AWS_SECRET_KEY"),
 		},
-		JWT: JWTConfig{
-			JWTSecret: os.Getenv("JWT_SECRET"),
+		OAuth: OAuthConfig{
+			GoogleClientId:     os.Getenv("GOOGLE_CLIENT_ID"),
+			GoogleClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+			SessionSecret:      os.Getenv("SESSION_SECRET"),
 		},
 	}
 }
