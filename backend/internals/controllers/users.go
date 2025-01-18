@@ -44,12 +44,7 @@ func CreateUser(c *gin.Context) {
 	user.Email = userReq.Email
 
 	// Hashing password
-	var err error
-	user.Password, err = utils.HashPassword(userReq.Password)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
-		return
-	}
+	user.Password = utils.Hash(userReq.Password)
 
 	result := database.DB.Create(&user)
 	if result.Error != nil {
@@ -81,12 +76,7 @@ func UpdateUser(c *gin.Context) {
 	user.Username = userReq.Username
 
 	// Hashing password
-	var err error
-	user.Password, err = utils.HashPassword(userReq.Password)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
-		return
-	}
+	user.Password = utils.Hash(userReq.Password)
 
 	// Update user
 	result := database.DB.Save(&user)

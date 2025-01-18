@@ -1,9 +1,11 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/Nishantdd/uploadurl/backend/internals/service"
+	"github.com/Nishantdd/uploadurl/backend/internals/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
 )
@@ -35,9 +37,10 @@ func HandleGoogleCallback(c *gin.Context) {
 		return
 	}
 
+	tempToken := utils.Hash(userInfo.Email, userInfo.Name)
+	log.Println(tempToken)
 	c.JSON(http.StatusOK, gin.H{
-		"email":  userInfo.Email,
-		"name":   userInfo.Name,
 		"avatar": userInfo.Picture,
+		"token":  utils.Hash(userInfo.Email, userInfo.Name),
 	})
 }
