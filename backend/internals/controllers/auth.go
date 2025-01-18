@@ -7,6 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func GoogleCallback(c *gin.Context) {
+	c.Redirect(302, config.Load().App.Address)
+}
+
 func UserInfoHandler(c *gin.Context) {
 	user, exists := c.Get("user")
 	if !exists {
@@ -21,5 +25,5 @@ func UserInfoHandler(c *gin.Context) {
 
 func Logout(c *gin.Context) {
 	c.SetCookie(config.Load().OAuth.SessionName, "", -1, "/", "", false, true)
-	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
+	c.Redirect(302, config.Load().App.Address)
 }

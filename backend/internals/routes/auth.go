@@ -8,6 +8,7 @@ import (
 
 func AuthRoutes(router *gin.Engine) {
 	router.GET("/login", google.LoginHandler)
+	router.GET("/auth/callback", controllers.GoogleCallback)
 	router.GET("/logout", controllers.Logout)
 
 	AuthGroup := router.Group("/auth")

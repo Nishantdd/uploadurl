@@ -27,9 +27,5 @@ func main() {
 	router.Use(google.Session(cfg.OAuth.SessionName))
 	routes.HandleRoutes(router)
 
-	if err := router.Run(cfg.Server.Address); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
-	} else {
-		log.Printf("Listening on %v", cfg.Server.Address)
-	}
+	log.Fatal(router.Run(cfg.Server.Address))
 }

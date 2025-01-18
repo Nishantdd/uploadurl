@@ -7,9 +7,12 @@ import (
 
 func InitOAuth() {
 	cfg := config.Load()
+	var (
+		redirectURL  = cfg.OAuth.RedirectURL
+		clientId     = cfg.OAuth.GoogleClientId
+		clientSecret = cfg.OAuth.GoogleClientSecret
+	)
 
-	redirectURL := cfg.OAuth.RedirectURL
-	credFile := cfg.OAuth.CredFilePath
 	scopes := []string{
 		"https://www.googleapis.com/auth/userinfo.email",
 		"https://www.googleapis.com/auth/userinfo.profile",
@@ -17,5 +20,5 @@ func InitOAuth() {
 	secret := []byte(cfg.OAuth.OAuthSecret)
 
 	// Initialize Google OAuth2
-	google.Setup(redirectURL, credFile, scopes, secret)
+	google.SetupFromString(redirectURL, clientId, clientSecret, scopes, secret)
 }
