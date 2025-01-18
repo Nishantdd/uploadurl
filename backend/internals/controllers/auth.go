@@ -3,7 +3,6 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/Nishantdd/uploadurl/backend/internals/middleware"
 	"github.com/Nishantdd/uploadurl/backend/internals/service"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
@@ -30,7 +29,7 @@ func HandleGoogleCallback(c *gin.Context) {
 
 	// Use the access token to get the user's Google profile
 	client := service.Oauth2Config.Client(c, token)
-	userInfo, err := middleware.GetGoogleUserInfo(client)
+	userInfo, err := service.GetGoogleUserInfo(client)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to retrieve user info"})
 		return

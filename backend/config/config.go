@@ -69,7 +69,7 @@ func Load() *Config {
 		OAuth: OAuthConfig{
 			GoogleClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
 			GoogleClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
-			RedirectURL:        os.Getenv("OAUTH_REDIRECT_URL"),
+			RedirectURL:        os.Getenv("REDIRECT_URL"),
 		},
 	}
 }

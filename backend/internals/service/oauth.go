@@ -1,7 +1,11 @@
 package service
 
 import (
+	"encoding/json"
+	"net/http"
+
 	"github.com/Nishantdd/uploadurl/backend/config"
+	"github.com/Nishantdd/uploadurl/backend/internals/models"
 	"github.com/Nishantdd/uploadurl/backend/internals/utils"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -22,4 +26,19 @@ func InitOauth() (oauth2.Config, string) {
 
 	Oauth2State = utils.GenerateState()
 	return Oauth2Config, Oauth2State
+}
+
+func GetGoogleUserInfo(client *http.Client) (*models.GoogleUserInfo, error) {
+	resp, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var userInfo models.GoogleUserInfo
+	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
+		return nil, err
+	}
+
+	return &userInfo, nil
 }
