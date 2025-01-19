@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/Nishantdd/uploadurl/backend/config"
+	"github.com/Nishantdd/uploadurl/backend/internals/controllers"
 	"github.com/Nishantdd/uploadurl/backend/internals/database"
 	"github.com/Nishantdd/uploadurl/backend/internals/routes"
 	"github.com/Nishantdd/uploadurl/backend/internals/service"
@@ -26,6 +27,8 @@ func main() {
 	}))
 	router.Use(google.Session(cfg.OAuth.SessionName))
 	routes.HandleRoutes(router)
+	router.GET("/auth/callback", controllers.HandleGoogleCallback)
+	router.GET("/login", controllers.HandleGoogleLogin)
 
 	log.Fatal(router.Run(cfg.Server.Address))
 }

@@ -1,17 +1,28 @@
 package utils
 
 import (
-	"golang.org/x/crypto/bcrypt"
+	"crypto/sha256"
+	"errors"
+	"fmt"
+	"strings"
 )
 
-func HashPassword(input string) (string, error) {
-	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(input), bcrypt.DefaultCost)
-	if err != nil {
-		return "", err
+func Hash(data ...string) string {
+	var input strings.Builder
+	for _, s := range data {
+		input.WriteString(s)
 	}
-	return string(hashedBytes), nil
+
+	h := sha256.New()
+	h.Write([]byte(input.String()))
+	hashedBytes := h.Sum(nil)
+	return fmt.Sprintf("%x", hashedBytes)
 }
 
-func CompareHash(hashedString, input string) error {
-	return bcrypt.CompareHashAndPassword([]byte(hashedString), []byte(input))
+func CompareHash(hashedString string, data ...string) error {
+	inputHash := Hash(data...)
+	if inputHash == hashedString {
+		return nil
+	}
+	return errors.New("hashes did not match")
 }

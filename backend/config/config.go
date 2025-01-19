@@ -81,7 +81,7 @@ func Load() *Config {
 			RedirectURL:        os.Getenv("REDIRECT_URL"),
 			GoogleClientId:     os.Getenv("GOOGLE_CLIENT_ID"),
 			GoogleClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
-			SessionName:        os.Getenv("SESSION_NAME"),
+			RedirectURL:        os.Getenv("REDIRECT_URL"),
 		},
 	}
 }
