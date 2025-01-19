@@ -33,7 +33,7 @@ func GetUserByID(c *gin.Context) {
 }
 
 func CreateUser(c *gin.Context) {
-	var userReq models.UserWithPassword
+	var userReq models.UserRequest
 	var user models.User
 
 	if err := c.ShouldBindJSON(&userReq); err != nil {
@@ -42,6 +42,7 @@ func CreateUser(c *gin.Context) {
 	}
 	user.Username = userReq.Username
 	user.Email = userReq.Email
+	user.Fullname = userReq.Fullname
 
 	// Hashing password
 	user.Password = utils.Hash(userReq.Password)
@@ -52,13 +53,12 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	user.Password = "" // prevention from sending password
 	c.JSON(http.StatusCreated, gin.H{"user": user})
 }
 
 func UpdateUser(c *gin.Context) {
 	var user models.User
-	var userReq models.UserWithPassword
+	var userReq models.UserRequest
 	id := c.Param("id")
 
 	// Check if user exists
@@ -74,6 +74,7 @@ func UpdateUser(c *gin.Context) {
 	}
 	user.Email = userReq.Email
 	user.Username = userReq.Username
+	user.Fullname = userReq.Fullname
 
 	// Hashing password
 	user.Password = utils.Hash(userReq.Password)

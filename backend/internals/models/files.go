@@ -1,6 +1,6 @@
 package models
 
-type Files struct {
+type File struct {
 	Model
 	FileName string `gorm:"type:varchar(50);not null" json:"filename" binding:"required,min=1,max=50"`
 	FileHash string `gorm:"type:varchar(64);not null;unique" json:"filehash"`

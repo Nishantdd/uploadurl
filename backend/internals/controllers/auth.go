@@ -3,6 +3,8 @@ package controllers
 import (
 	"net/http"
 
+	"github.com/Nishantdd/uploadurl/backend/internals/database"
+	"github.com/Nishantdd/uploadurl/backend/internals/models"
 	"github.com/Nishantdd/uploadurl/backend/internals/service"
 	"github.com/Nishantdd/uploadurl/backend/internals/utils"
 	"github.com/gin-gonic/gin"
@@ -22,24 +24,54 @@ func HandleGoogleCallback(c *gin.Context) {
 	}
 
 	// Exchange the authorization code for an access token
-	token, err := service.Oauth2Config.Exchange(c, code)
+	exchangeToken, err := service.Oauth2Config.Exchange(c, code)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to exchange token"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to exchange Token"})
 		return
 	}
 
-	// Use the access token to get the user's Google profile
-	client := service.Oauth2Config.Client(c, token)
+	// Use the access Token to get the user's Google profile
+	client := service.Oauth2Config.Client(c, exchangeToken)
 	userInfo, err := service.GetGoogleUserInfo(client)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to retrieve user info"})
 		return
 	}
 
-	// Hashing and sending response
+	// Creating User if not exists
+	var user models.User
+	userRes := database.DB.Where("email = ?", userInfo.Email).First(&user)
+	if userRes.Error != nil {
+		user = models.User{
+			Username: userInfo.Email,
+			Email:    userInfo.Email,
+			Fullname: userInfo.Name,
+		}
+		if err := database.DB.Create(&user).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+			return
+		}
+	}
+
+	// Hashing Token
 	hashToken := utils.Hash(userInfo.Email, userInfo.Name)
+
+	// Creating Token if not exists
+	var token models.Token
+	tokenRes := database.DB.Where("token = ?", hashToken).First(&token)
+	if tokenRes.Error != nil {
+		token = models.Token{
+			Token: hashToken,
+		}
+		if err := database.DB.Create(&token).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+			return
+		}
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"avatar": userInfo.Picture,
-		"token":  hashToken,
+		"token":  token,
+		"user":   user,
 	})
 }
