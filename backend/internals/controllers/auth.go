@@ -1,22 +1,23 @@
 package controllers
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/Nishantdd/uploadurl/backend/internals/service"
 	"github.com/Nishantdd/uploadurl/backend/internals/utils"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/oauth2"
 )
 
-func GoogleCallback(c *gin.Context) {
-	c.Redirect(302, config.Load().App.Address)
+func HandleGoogleLogin(c *gin.Context) {
+	url := service.Oauth2Config.AuthCodeURL(service.Oauth2State, oauth2.AccessTypeOffline)
+	c.Redirect(http.StatusFound, url)
 }
 
-func UserInfoHandler(c *gin.Context) {
-	user, exists := c.Get("user")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "user not authenticated"})
+func HandleGoogleCallback(c *gin.Context) {
+	code := c.DefaultQuery("code", "")
+	if code == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Code not found"})
 		return
 	}
 
@@ -35,15 +36,10 @@ func UserInfoHandler(c *gin.Context) {
 		return
 	}
 
-	tempToken := utils.Hash(userInfo.Email, userInfo.Name)
-	log.Println(tempToken)
+	// Hashing and sending response
+	hashToken := utils.Hash(userInfo.Email, userInfo.Name)
 	c.JSON(http.StatusOK, gin.H{
 		"avatar": userInfo.Picture,
-		"token":  utils.Hash(userInfo.Email, userInfo.Name),
+		"token":  hashToken,
 	})
-}
-
-func Logout(c *gin.Context) {
-	c.SetCookie(config.Load().OAuth.SessionName, "", -1, "/", "", false, true)
-	c.Redirect(302, config.Load().App.Address)
 }

@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"crypto/rand"
 	"crypto/sha256"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"strings"
@@ -25,4 +27,10 @@ func CompareHash(hashedString string, data ...string) error {
 		return nil
 	}
 	return errors.New("hashes did not match")
+}
+
+func GenerateState() string {
+	b := make([]byte, 32)
+	rand.Read(b)
+	return base64.StdEncoding.EncodeToString(b)
 }

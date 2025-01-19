@@ -6,25 +6,26 @@ import (
 
 	"github.com/Nishantdd/uploadurl/backend/config"
 	"github.com/Nishantdd/uploadurl/backend/internals/models"
+	"github.com/Nishantdd/uploadurl/backend/internals/utils"
+	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
 
-func InitOAuth() {
+var Oauth2Config oauth2.Config
+var Oauth2State string
+
+func InitOauth() (oauth2.Config, string) {
 	cfg := config.Load()
-	var (
-		redirectURL  = cfg.OAuth.RedirectURL
-		clientId     = cfg.OAuth.GoogleClientId
-		clientSecret = cfg.OAuth.GoogleClientSecret
-	)
-
-	scopes := []string{
-		"https://www.googleapis.com/auth/userinfo.email",
-		"https://www.googleapis.com/auth/userinfo.profile",
+	config := oauth2.Config{
+		ClientID:     cfg.OAuth.GoogleClientID,
+		ClientSecret: cfg.OAuth.GoogleClientSecret,
+		RedirectURL:  cfg.OAuth.RedirectURL,
+		Scopes:       []string{"openid", "profile", "email"}, // Permissions requested
+		Endpoint:     google.Endpoint,
 	}
-	secret := []byte(cfg.OAuth.OAuthSecret)
 
-	// Initialize Google OAuth2
-	google.SetupFromString(redirectURL, clientId, clientSecret, scopes, secret)
+	state := utils.GenerateState()
+	return config, state
 }
 
 func GetGoogleUserInfo(client *http.Client) (*models.GoogleUserInfo, error) {
