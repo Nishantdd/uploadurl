@@ -23,3 +23,15 @@ type GoogleUserInfo struct {
 	Name    string `json:"name"`
 	Picture string `json:"picture"`
 }
+
+type LoginRequest struct {
+	UsernameOrEmail string `json:"username_or_email" binding:"required"`
+	Password        string `json:"password" binding:"required"`
+}
+
+type SignupRequest struct {
+	Username string `json:"username" binding:"required"`
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required,min=8,max=30"`
+	Fullname string `json:"fullname" binding:"max=100"`
+}
