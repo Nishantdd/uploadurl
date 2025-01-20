@@ -16,7 +16,8 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	Address string
+	ServerAddress string
+	DomainAddress string
 }
 
 type PostgresConfig struct {
@@ -48,7 +49,8 @@ type OAuthConfig struct {
 func Load() *Config {
 	return &Config{
 		Server: ServerConfig{
-			Address: os.Getenv("SERVER_ADDRESS"),
+			ServerAddress: os.Getenv("SERVER_ADDRESS"),
+			DomainAddress: os.Getenv("DOMAIN_ADDRESS"),
 		},
 		Postgres: PostgresConfig{
 			URI: os.Getenv("DATABASE_URL"),

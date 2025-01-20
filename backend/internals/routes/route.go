@@ -7,4 +7,5 @@ func HandleRoutes(router *gin.Engine) {
 
 	apiGroup := router.Group("/api")
 	UserRoutes(apiGroup)
+	UrlRoutes(apiGroup)
 }
