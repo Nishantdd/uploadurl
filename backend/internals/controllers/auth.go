@@ -12,6 +12,10 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	usernameLength = 4
+)
+
 func GoogleLogin(c *gin.Context) {
 	url := service.Oauth2Config.AuthCodeURL(service.Oauth2State, oauth2.AccessTypeOffline)
 	c.Redirect(http.StatusFound, url)
@@ -39,8 +43,8 @@ func GoogleCallback(c *gin.Context) {
 		return
 	}
 
-	// Generating unique username of length 4
-	username := utils.GenerateUniqueString(4)
+	// Generating unique username of length
+	username := utils.GenerateUniqueString(usernameLength)
 
 	// Creating User if not exists
 	var user models.User

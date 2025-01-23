@@ -10,3 +10,7 @@ type Url struct {
 	Files       []File  `gorm:"foreignKey:UrlId;constraint:OnDelete:SET NULL;" json:"files,omitempty"` // One-to-Many
 	Slug        string  `gorm:"type:text;not null;unique" json:"slug"`                                 // One-to-One
 }
+
+type UrlRequest struct {
+	Url string `json:"url" binding:"required"`
+}

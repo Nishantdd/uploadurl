@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/Nishantdd/uploadurl/backend/internals/models"
 	"github.com/Nishantdd/uploadurl/backend/internals/service"
 	"github.com/Nishantdd/uploadurl/backend/internals/utils"
 	"github.com/gin-gonic/gin"
@@ -14,21 +15,27 @@ const (
 )
 
 func ShortenUrl(c *gin.Context) {
-	var body struct {
-		Url    string  `json:"url" binding:"required"` // Original url of the user
-		UserId *uint64 `json:"user_id"`                // UserId (optional)
-	}
-	if err := c.ShouldBindJSON(&body); err != nil {
+	var urlReq models.UrlRequest
+	userId, _ := c.Get("userId")
+
+	if err := c.ShouldBindJSON(&urlReq); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if _, err := url.Parse(body.Url); err != nil {
+	if _, err := url.Parse(urlReq.Url); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid URL"})
 	}
 
 	slugValue := utils.GenerateUniqueString(ShortURLLength)
-	if err := service.RegisterUrl(body.Url, slugValue, "short", nil); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+	if userId != nil {
+		if err := service.RegisterUrl(urlReq.Url, slugValue, "short", userId.(*uint64)); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+	} else {
+		if err := service.RegisterUrl(urlReq.Url, slugValue, "short", nil); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
 	}
 }

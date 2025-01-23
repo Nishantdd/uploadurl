@@ -8,10 +8,19 @@ import (
 func UserRoutes(r *gin.RouterGroup) {
 	userGroup := r.Group("/users")
 	{
-		userGroup.GET("", controllers.GetUsers)          // read all
+		userGroup.GET("/", controllers.GetUsers)         // read all
 		userGroup.POST("", controllers.CreateUser)       // create
 		userGroup.GET("/:id", controllers.GetUserByID)   // read one
 		userGroup.PUT("/:id", controllers.UpdateUser)    // update
 		userGroup.DELETE("/:id", controllers.DeleteUser) // delete
+	}
+}
+
+func UserRoutesAuth(r *gin.RouterGroup) {
+	authGroup := r.Group("/auth/profile")
+	{
+		authGroup.GET("/", controllers.GetUserAuth)
+		authGroup.PUT("/", controllers.UpdateUserAuth)
+		authGroup.DELETE("/", controllers.DeleteUserAuth)
 	}
 }
