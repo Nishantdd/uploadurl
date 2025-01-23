@@ -5,6 +5,7 @@ import (
 	"net/url"
 
 	"github.com/Nishantdd/uploadurl/backend/internals/service"
+	"github.com/Nishantdd/uploadurl/backend/internals/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,7 +27,7 @@ func ShortenUrl(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid URL"})
 	}
 
-	slugValue := service.GenerateRandomSlug(ShortURLLength)
+	slugValue := utils.GenerateUniqueString(ShortURLLength)
 	if err := service.RegisterUrl(body.Url, slugValue, "short", nil); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}

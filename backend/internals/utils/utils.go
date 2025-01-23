@@ -1,11 +1,12 @@
 package utils
 
 import (
-	"crypto/rand"
+	cryptRand "crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
 	"errors"
 	"fmt"
+	mathRand "math/rand/v2"
 	"strings"
 )
 
@@ -31,6 +32,18 @@ func CompareHash(hashedString string, data ...string) error {
 
 func GenerateState() string {
 	b := make([]byte, 32)
-	rand.Read(b)
+	cryptRand.Read(b)
 	return base64.StdEncoding.EncodeToString(b)
+}
+
+// Takes length as input and returns a alphanumeric string of given length
+func GenerateUniqueString(len int) string {
+	var slug strings.Builder
+
+	allowedCharacters := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ12334567890"
+	for i := 0; i < len; i++ {
+		slug.WriteByte(allowedCharacters[mathRand.IntN(16)])
+	}
+
+	return slug.String()
 }

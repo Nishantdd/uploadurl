@@ -39,12 +39,15 @@ func GoogleCallback(c *gin.Context) {
 		return
 	}
 
+	// Generating unique username of length 4
+	username := utils.GenerateUniqueString(4)
+
 	// Creating User if not exists
 	var user models.User
 	userRes := database.DB.Where("email = ?", userInfo.Email).First(&user)
 	if userRes.Error != nil {
 		user = models.User{
-			Username: userInfo.Email,
+			Username: username,
 			Email:    userInfo.Email,
 			Fullname: userInfo.Name,
 		}
@@ -62,7 +65,8 @@ func GoogleCallback(c *gin.Context) {
 	tokenRes := database.DB.Where("token = ?", hashToken).First(&token)
 	if tokenRes.Error != nil {
 		token = models.Token{
-			Token: hashToken,
+			Token:  hashToken,
+			UserId: &user.ID,
 		}
 		if err := database.DB.Create(&token).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
@@ -163,7 +167,8 @@ func Signup(c *gin.Context) {
 	tokenRes := database.DB.Where("token = ?", hashToken).First(&token)
 	if tokenRes.Error != nil {
 		token = models.Token{
-			Token: hashToken,
+			Token:  hashToken,
+			UserId: &newUser.ID,
 		}
 		if err := database.DB.Create(&token).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
