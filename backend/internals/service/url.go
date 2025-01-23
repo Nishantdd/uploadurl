@@ -39,7 +39,7 @@ func RegisterUrl(originalUrl string, slugValue string, urlType string, userId *u
 	}
 
 	slug := models.Slug{
-		UrlId:  &url.ID,
+		UrlId:  url.ID,
 		Slug:   slugValue,
 		UserId: userId,
 	}
