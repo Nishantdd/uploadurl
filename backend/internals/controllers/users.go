@@ -43,6 +43,7 @@ func CreateUser(c *gin.Context) {
 	user.Username = userReq.Username
 	user.Email = userReq.Email
 	user.Fullname = userReq.Fullname
+	user.Avatar = userReq.Avatar
 
 	// Hashing password
 	user.Password = utils.Hash(userReq.Password)
@@ -75,6 +76,7 @@ func UpdateUser(c *gin.Context) {
 	user.Email = userReq.Email
 	user.Username = userReq.Username
 	user.Fullname = userReq.Fullname
+	user.Avatar = userReq.Avatar
 
 	// Hashing password
 	user.Password = utils.Hash(userReq.Password)
