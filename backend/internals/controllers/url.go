@@ -15,7 +15,7 @@ const (
 func ShortenUrl(c *gin.Context) {
 	var body struct {
 		Url    string  `json:"url" binding:"required"` // Original url of the user
-		UserId *uint64 `json:"userid"`                 // UserId (optional)
+		UserId *uint64 `json:"user_id"`                // UserId (optional)
 	}
 	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

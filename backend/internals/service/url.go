@@ -25,48 +25,28 @@ func GenerateRandomSlug(len int) string {
 func RegisterUrl(originalUrl string, slugValue string, urlType string, userId *uint64) error {
 	shortUrl := config.Load().Server.DomainAddress + "/" + slugValue
 
-	var url models.Url
-	if userId != nil {
-		url = models.Url{
-			OriginalUrl: originalUrl,
-			ShortUrl:    shortUrl,
-			Type:        urlType,
-			UserId:      *userId,
-			Slug:        slugValue,
-		}
-	} else {
-		url = models.Url{
-			OriginalUrl: originalUrl,
-			ShortUrl:    shortUrl,
-			Type:        urlType,
-			Slug:        slugValue,
-		}
+	url := models.Url{
+		OriginalUrl: originalUrl,
+		ShortUrl:    shortUrl,
+		Type:        urlType,
+		Slug:        slugValue,
+		UserId:      userId,
 	}
 
-	// creating a new url in database
 	res := database.DB.Create(&url)
 	if res.Error != nil {
-		return errors.New(res.Error.Error())
+		return errors.New("failed to create URL: " + res.Error.Error())
 	}
 
-	var slug models.Slug
-	if userId != nil {
-		slug = models.Slug{
-			UrlId:  url.ID,
-			UserId: *userId,
-			Slug:   slugValue,
-		}
-	} else {
-		slug = models.Slug{
-			UrlId: url.ID,
-			Slug:  slugValue,
-		}
+	slug := models.Slug{
+		UrlId:  &url.ID,
+		Slug:   slugValue,
+		UserId: userId,
 	}
 
-	// registering the slug in database
 	res = database.DB.Create(&slug)
 	if res.Error != nil {
-		return errors.New(res.Error.Error())
+		return errors.New("failed to create slug: " + res.Error.Error())
 	}
 
 	return nil
