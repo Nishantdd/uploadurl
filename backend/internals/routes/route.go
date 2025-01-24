@@ -6,15 +6,23 @@ import (
 )
 
 func HandleRoutes(router *gin.Engine) {
+	// unprotected routes
 	AuthRoutes(router)
 
-	Group := router.Group("")
+	Group := router.Group("/api")
 	UserRoutes(Group)
 
-	// protected routes
+	// optionally protected routes (works with & without authToken)
+	optionalGroup := router.Group("/api")
+	optionalGroup.Use(middleware.ValidateOptionalAuth())
+	{
+		UrlRoutes(optionalGroup)
+	}
+
+	// protected routes (works only with authToken)
 	protectedGroup := router.Group("/api")
 	protectedGroup.Use(middleware.ValidateAuth())
 	{
-		UrlRoutes(protectedGroup)
+		UserRoutesAuth(protectedGroup)
 	}
 }

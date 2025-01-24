@@ -21,9 +21,9 @@ type UserRequest struct {
 }
 
 type GoogleUserInfo struct {
-	Email  string `json:"email"`
-	Name   string `json:"name"`
-	Avatar string `json:"avatar"`
+	Email   string `json:"email"`
+	Name    string `json:"name"`
+	Picture string `json:"picture"`
 }
 
 type LoginRequest struct {

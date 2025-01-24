@@ -54,7 +54,7 @@ func GoogleCallback(c *gin.Context) {
 			Username: username,
 			Email:    userInfo.Email,
 			Fullname: userInfo.Name,
-			Avatar:   userInfo.Avatar,
+			Avatar:   userInfo.Picture,
 		}
 		if err := database.DB.Create(&user).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
@@ -79,7 +79,7 @@ func GoogleCallback(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	c.JSON(http.StatusOK, gin.H{"token": token.Token})
 }
 
 func Login(c *gin.Context) {
@@ -118,7 +118,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	c.JSON(http.StatusOK, gin.H{"token": token.Token})
 }
 
 func Signup(c *gin.Context) {
@@ -174,5 +174,5 @@ func Signup(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	c.JSON(http.StatusOK, gin.H{"token": token.Token})
 }

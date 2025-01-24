@@ -21,7 +21,8 @@ func ValidateAuth() gin.HandlerFunc {
 		var token models.Token
 		tokenRes := database.DB.Where("token = ?", authToken).First(&token)
 		if tokenRes.Error != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorised Access not allowed!!!"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+			c.Abort()
 			return
 		}
 
@@ -33,7 +34,36 @@ func ValidateAuth() gin.HandlerFunc {
 			return
 		}
 
-		// Set user in context
+		c.Set("userId", user.ID)
+		c.Next()
+	}
+}
+
+func ValidateOptionalAuth() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		authToken := c.GetHeader("Authorization")
+		if authToken == "" {
+			c.Next()
+			return
+		}
+
+		// Check if token exists
+		var token models.Token
+		tokenRes := database.DB.Where("token = ?", authToken).First(&token)
+		if tokenRes.Error != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+			c.Abort()
+			return
+		}
+
+		// Get user from database
+		var user models.User
+		if err := database.DB.First(&user, token.UserId).Error; err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+			c.Abort()
+			return
+		}
+
 		c.Set("userId", user.ID)
 		c.Next()
 	}

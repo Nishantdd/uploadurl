@@ -16,7 +16,7 @@ const (
 
 func ShortenUrl(c *gin.Context) {
 	var urlReq models.UrlRequest
-	userId, _ := c.Get("userId")
+	userId, exists := c.Get("userId")
 
 	if err := c.ShouldBindJSON(&urlReq); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -25,17 +25,26 @@ func ShortenUrl(c *gin.Context) {
 
 	if _, err := url.Parse(urlReq.Url); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid URL"})
+		return
 	}
 
 	slugValue := utils.GenerateUniqueString(ShortURLLength)
 
-	if userId != nil {
-		if err := service.RegisterUrl(urlReq.Url, slugValue, "short", userId.(*uint64)); err != nil {
+	if exists {
+		userIdValue := userId.(uint64)
+		if err := service.RegisterUrl(urlReq.Url, slugValue, "short", &userIdValue); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
 		}
 	} else {
 		if err := service.RegisterUrl(urlReq.Url, slugValue, "short", nil); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
 		}
 	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"short_url": slugValue,
+		"url":       urlReq.Url,
+	})
 }

@@ -6,8 +6,8 @@ import (
 )
 
 func AuthRoutes(router *gin.Engine) {
-	router.GET("/login", controllers.Login)
-	router.GET("/signup", controllers.Signup)
+	router.POST("/login", controllers.Login)
+	router.POST("/signup", controllers.Signup)
 	router.GET("/googlelogin", controllers.GoogleLogin)
 	router.GET("/auth/callback", controllers.GoogleCallback)
 }
