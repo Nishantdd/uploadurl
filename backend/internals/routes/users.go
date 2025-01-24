@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/Nishantdd/uploadurl/backend/internals/controllers"
+	"github.com/Nishantdd/uploadurl/backend/internals/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,6 +19,7 @@ func UserRoutes(r *gin.RouterGroup) {
 
 func UserRoutesAuth(r *gin.RouterGroup) {
 	authGroup := r.Group("/auth/profile")
+	authGroup.Use(middleware.ValidateAuth())
 	{
 		authGroup.GET("/", controllers.GetUserAuth)
 		authGroup.PUT("/", controllers.UpdateUserAuth)
