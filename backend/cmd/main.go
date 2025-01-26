@@ -18,6 +18,7 @@ func main() {
 	service.Oauth2Config, service.Oauth2State = service.InitOauth()
 
 	router := gin.Default()
+	router.MaxMultipartMemory = 8 << 20 // 8MiB
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
@@ -26,9 +27,5 @@ func main() {
 	}))
 	routes.HandleRoutes(router)
 
-	if err := router.Run(cfg.Server.ServerAddress); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
-	} else {
-		log.Printf("Listening on %v", cfg.Server.ServerAddress)
-	}
+	log.Fatal(router.Run(cfg.Server.ServerAddress))
 }

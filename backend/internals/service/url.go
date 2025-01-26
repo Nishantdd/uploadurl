@@ -9,12 +9,12 @@ import (
 )
 
 func RegisterUrl(originalUrl string, slugValue string, urlType string, userId *uint64) error {
+
 	shortUrl := config.Load().Server.DomainAddress + "/" + slugValue
 
 	url := models.Url{
 		OriginalUrl: originalUrl,
 		ShortUrl:    shortUrl,
-		Type:        urlType,
 		Slug:        slugValue,
 		UserId:      userId,
 	}

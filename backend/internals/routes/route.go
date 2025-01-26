@@ -12,4 +12,5 @@ func HandleRoutes(router *gin.Engine) {
 	UserRoutes(Group)
 	UrlRoutes(Group)
 	UserRoutesAuth(Group)
+	FileRoutes(Group)
 }
