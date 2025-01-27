@@ -2,7 +2,9 @@ package controllers
 
 import (
 	"net/http"
+	"strings"
 
+	"github.com/Nishantdd/uploadurl/backend/config"
 	"github.com/Nishantdd/uploadurl/backend/internals/database"
 	"github.com/Nishantdd/uploadurl/backend/internals/models"
 	"github.com/Nishantdd/uploadurl/backend/internals/service"
@@ -17,7 +19,14 @@ const (
 )
 
 func GoogleLogin(c *gin.Context) {
-	url := service.Oauth2Config.AuthCodeURL(service.Oauth2State, oauth2.AccessTypeOffline)
+	redirect := c.DefaultQuery("redirect", "")
+	state := service.Oauth2State
+
+	if redirect != "" {
+		state = state + ":" + redirect
+	}
+
+	url := service.Oauth2Config.AuthCodeURL(state, oauth2.AccessTypeOffline)
 	c.Redirect(http.StatusFound, url)
 }
 
@@ -26,6 +35,16 @@ func GoogleCallback(c *gin.Context) {
 	if code == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Code not found"})
 		return
+	}
+
+	// Extract redirect URL from state parameter
+	state := c.DefaultQuery("state", "")
+	redirect := ""
+	if state != "" {
+		stateParts := strings.Split(state, ":")
+		if len(stateParts) > 1 {
+			redirect = stateParts[1]
+		}
 	}
 
 	// Exchange the authorization code for an access token
@@ -79,7 +98,15 @@ func GoogleCallback(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": token.Token})
+	// Preparing redirect endpoints
+	redirectURL := config.Load().Server.DomainAddress + "?token=" + token.Token
+	if redirect != "" {
+		redirectURL = config.Load().Server.DomainAddress + "/" + redirect + "?token=" + token.Token
+	}
+
+	// c.JSON(http.StatusOK, gin.H{"token": token.Token})
+	c.Header("Location", redirectURL)
+	c.Status(http.StatusFound)
 }
 
 func Login(c *gin.Context) {
