@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/Nishantdd/uploadurl/backend/config"
 	"github.com/Nishantdd/uploadurl/backend/internals/models"
 	"github.com/Nishantdd/uploadurl/backend/internals/service"
 	"github.com/Nishantdd/uploadurl/backend/internals/utils"
@@ -44,7 +45,7 @@ func ShortenUrl(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"short_url": slugValue,
+		"short_url": config.Load().Server.DomainAddress + "/" + slugValue,
 		"url":       urlReq.Url,
 	})
 }

@@ -3,6 +3,7 @@ module github.com/Nishantdd/uploadurl/backend
 go 1.23.4
 
 require (
+	github.com/aws/aws-sdk-go v1.55.6
 	github.com/gin-contrib/cors v1.7.3
 	github.com/gin-gonic/gin v1.10.0
 	github.com/joho/godotenv v1.5.1
@@ -13,7 +14,6 @@ require (
 
 require (
 	cloud.google.com/go/compute/metadata v0.5.0 // indirect
-	github.com/aws/aws-sdk-go v1.55.6 // indirect
 	github.com/bytedance/sonic v1.12.6 // indirect
 	github.com/bytedance/sonic/loader v0.2.1 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
