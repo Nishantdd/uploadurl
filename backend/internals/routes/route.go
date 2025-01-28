@@ -10,7 +10,7 @@ func HandleRoutes(router *gin.Engine) {
 
 	Group := router.Group("/api")
 	UserRoutes(Group)
-	UrlRoutes(Group)
 	UserRoutesAuth(Group)
+	UrlRoutes(Group)
 	FileRoutes(Group)
 }

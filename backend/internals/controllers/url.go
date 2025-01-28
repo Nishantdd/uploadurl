@@ -5,6 +5,7 @@ import (
 	"net/url"
 
 	"github.com/Nishantdd/uploadurl/backend/config"
+	"github.com/Nishantdd/uploadurl/backend/internals/database"
 	"github.com/Nishantdd/uploadurl/backend/internals/models"
 	"github.com/Nishantdd/uploadurl/backend/internals/service"
 	"github.com/Nishantdd/uploadurl/backend/internals/utils"
@@ -48,4 +49,38 @@ func ShortenUrl(c *gin.Context) {
 		"short_url": config.Load().Server.DomainAddress + "/" + slugValue,
 		"url":       urlReq.Url,
 	})
+}
+
+func DeleteUrl(c *gin.Context) {
+	id := c.Param("id")
+
+	var url models.Url
+	urlRes := database.DB.Where("id = ?", id).First(&url)
+	if urlRes.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No Url Found"})
+		c.Abort()
+		return
+	}
+
+	var slug models.Slug
+	slugRes := database.DB.Where("slug = ?", url.Slug).First(&slug)
+	if slugRes.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No Slug Found"})
+		c.Abort()
+		return
+	}
+
+	delSlugRes := database.DB.Delete(&models.Slug{}, slug.ID)
+	if delSlugRes.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": delSlugRes.Error.Error()})
+		return
+	}
+
+	delUrlRes := database.DB.Delete(&models.Url{}, url.ID)
+	if delUrlRes.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": delUrlRes.Error.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "URL deleted successfully"})
 }

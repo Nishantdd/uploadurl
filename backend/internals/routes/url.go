@@ -8,8 +8,8 @@ import (
 
 func UrlRoutes(r *gin.RouterGroup) {
 	urlGroup := r.Group("/url")
-	urlGroup.Use(middleware.ValidateOptionalAuth())
 	{
-		urlGroup.POST("/shorten", controllers.ShortenUrl)
+		urlGroup.POST("/shorten", middleware.ValidateOptionalAuth(), controllers.ShortenUrl)
+		urlGroup.DELETE("/:id", middleware.ValidateAuth(), controllers.DeleteUrl)
 	}
 }
