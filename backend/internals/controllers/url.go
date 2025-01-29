@@ -22,7 +22,7 @@ func ShortenUrl(c *gin.Context) {
 	userId, exists := c.Get("userId")
 
 	if err := c.ShouldBindJSON(&urlReq); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Please provide an url"})
 		return
 	}
 

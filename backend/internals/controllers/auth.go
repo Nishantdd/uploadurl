@@ -118,7 +118,7 @@ func Login(c *gin.Context) {
 
 	// Check if the user already exists
 	var user models.User
-	if err := database.DB.Where("username = ? OR email = ?", input.UsernameOrEmail, input.UsernameOrEmail).First(&user).Error; err != nil {
+	if err := database.DB.Where("email = ?", input.Email).First(&user).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		} else {
@@ -151,13 +151,13 @@ func Login(c *gin.Context) {
 func Signup(c *gin.Context) {
 	var input models.SignupRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Required parameters missing"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Password must have atleast 8 characters"})
 		return
 	}
 
 	// Check if the user already exists
 	var existingUser models.User
-	if err := database.DB.Where("username = ? OR email = ?", input.Username, input.Email).First(&existingUser).Error; err != nil {
+	if err := database.DB.Where("email = ?", input.Email).First(&existingUser).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			// Proceed with signup if the user does not already exist
 		} else {
@@ -165,16 +165,19 @@ func Signup(c *gin.Context) {
 			return
 		}
 	} else {
-		c.JSON(http.StatusConflict, gin.H{"error": "Username or email already in use"})
+		c.JSON(http.StatusConflict, gin.H{"error": "Email already in use"})
 		return
 	}
 
 	// Hashing password
 	hashedPassword := utils.Hash(input.Password)
 
+	// Creating a random initial usename for the user
+	username := utils.GenerateUniqueString(4)
+
 	// Create the user in the database
 	newUser := models.User{
-		Username: input.Username,
+		Username: username,
 		Email:    input.Email,
 		Password: hashedPassword,
 	}
