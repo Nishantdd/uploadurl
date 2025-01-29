@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/Nishantdd/uploadurl/backend/config"
 	"github.com/Nishantdd/uploadurl/backend/internals/database"
@@ -83,4 +84,42 @@ func DeleteUrl(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "URL deleted successfully"})
+}
+
+func UpdateUrlHits(c *gin.Context) {
+	slug := c.Param("slug")
+
+	var url models.Url
+	urlRes := database.DB.Where("slug = ?", slug).First(&url)
+	if urlRes.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No Slug Found"})
+		c.Abort()
+		return
+	}
+
+	startOfDay := time.Now().Truncate(24 * time.Hour)
+	endOfDay := startOfDay.Add(24 * time.Hour)
+
+	var HitsObj models.UrlHits
+	if err := database.DB.Where("url_id = ? AND slug = ? AND created_at BETWEEN ? AND ?", url.ID, slug, startOfDay, endOfDay).First(&HitsObj).Error; err != nil {
+		// Create new hit record if not found
+		HitsObj = models.UrlHits{
+			UrlId: url.ID,
+			Slug:  slug,
+			Hits:  1,
+		}
+		if err := database.DB.Create(&HitsObj).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create hit record"})
+			return
+		}
+	} else {
+		// Update existing hit record
+		HitsObj.Hits++
+		if err := database.DB.Save(&HitsObj).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update hit record"})
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Hit count updated"})
 }

@@ -10,6 +10,7 @@ func UrlRoutes(r *gin.RouterGroup) {
 	urlGroup := r.Group("/url")
 	{
 		urlGroup.POST("/shorten", middleware.ValidateOptionalAuth(), controllers.ShortenUrl)
+		urlGroup.PATCH("/:slug", controllers.UpdateUrlHits)
 		urlGroup.DELETE("/:id", middleware.ValidateAuth(), controllers.DeleteUrl)
 	}
 }
