@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/Nishantdd/uploadurl/backend/internals/database"
@@ -30,6 +31,19 @@ func GetUserByID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"user": user})
+}
+
+func GetUsername(c *gin.Context) {
+	var user models.User
+	id := c.GetUint64("userId")
+	log.Printf("User ID: %d", id)
+
+	if err := database.DB.First(&user, "ID = ?", id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": id})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"username": user.Username})
 }
 
 func CreateUser(c *gin.Context) {

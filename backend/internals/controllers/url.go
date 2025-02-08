@@ -52,6 +52,30 @@ func ShortenUrl(c *gin.Context) {
 	})
 }
 
+func GetAllUrls(c *gin.Context) {
+	var urls []models.Url
+	urlRes := database.DB.Find(&urls)
+	if urlRes.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": urlRes.Error.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"urls": urls})
+}
+
+func GetUrls(c *gin.Context) {
+	userId, _ := c.Get("userId")
+
+	var urls []models.Url
+	urlRes := database.DB.Find(&urls, "user_id = ?", userId)
+	if urlRes.Error != nil || len(urls) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No Url Found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"urls": urls})
+}
+
 func DeleteUrl(c *gin.Context) {
 	id := c.Param("id")
 

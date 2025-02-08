@@ -9,11 +9,12 @@ import (
 func UserRoutes(r *gin.RouterGroup) {
 	userGroup := r.Group("/users")
 	{
-		userGroup.GET("/", controllers.GetUsers)         // read all
-		userGroup.POST("", controllers.CreateUser)       // create
-		userGroup.GET("/:id", controllers.GetUserByID)   // read one
-		userGroup.PUT("/:id", controllers.UpdateUser)    // update
-		userGroup.DELETE("/:id", controllers.DeleteUser) // delete
+		userGroup.GET("/", controllers.GetUsers)
+		userGroup.GET("/username", middleware.ValidateAuth(), controllers.GetUsername)
+		userGroup.POST("", controllers.CreateUser)
+		userGroup.GET("/:id", controllers.GetUserByID)
+		userGroup.PUT("/:id", controllers.UpdateUser)
+		userGroup.DELETE("/:id", controllers.DeleteUser)
 	}
 }
 
