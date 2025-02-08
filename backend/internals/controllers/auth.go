@@ -90,7 +90,7 @@ func GoogleCallback(c *gin.Context) {
 	if tokenRes.Error != nil {
 		token = models.Token{
 			Token:  hashToken,
-			UserId: &user.ID,
+			UserId: user.ID,
 		}
 		if err := database.DB.Create(&token).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
@@ -196,7 +196,7 @@ func Signup(c *gin.Context) {
 	if tokenRes.Error != nil {
 		token = models.Token{
 			Token:  hashToken,
-			UserId: &newUser.ID,
+			UserId: newUser.ID,
 		}
 		if err := database.DB.Create(&token).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
