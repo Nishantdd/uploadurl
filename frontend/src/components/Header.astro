@@ -1,5 +1,32 @@
-<header class="w-full py-4">
-    <h1 class="text-3xl font-bold">
-        <span class="text-black">upload</span><span class="text-red-700">url</span>
-    </h1>
+---
+const cookieValue = Astro.cookies.get('token')?.value
+console.log("COOKIE -> ", cookieValue)
+const token = Astro.cookies.get('token')?.value || ""
+const isLoggedIn = token.length > 0 ? true : false;
+---
+
+<header class="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-normal/10">
+    <div class="container mx-auto px-4 py-4">
+        <nav class="flex justify-between items-center">
+            <a href="/" class="text-2xl font-bold">
+                <span class="text-white">upload</span><span class="text-special">url</span>
+            </a>
+            
+            <div class="flex gap-6">
+                {isLoggedIn ? (
+                    <a>
+                        <a href="/dashboard" class="text-normal hover:text-special transition-colors">Dashboard</a>
+                        <a href="/profile" class="text-normal hover:text-special transition-colors">Profile</a>
+                    </>
+                ) : (
+                    <div class="flex gap-4">
+                        <a href="/sign-in" class="text-normal px-4 py-2 hover:text-special transition-colors">Sign In</a>
+                        <a href="/sign-up" class="bg-button text-white px-4 py-2 rounded-lg hover:bg-button-hover transition-colors">
+                            Sign Up
+                        </a>
+                    </div>
+                )}
+            </div>
+        </nav>
+    </div>
 </header>
