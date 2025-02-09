@@ -34,6 +34,24 @@ func GetFiles(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"files": files})
 }
 
+func GetFilesByUsername(c *gin.Context) {
+	var user models.User
+	username := c.Param("username")
+	if err := database.DB.First(&user, "username = ?", username).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	// TODO: Add a check if the user has provided private or public access
+
+	var files []models.File
+	if err := database.DB.Find(&files, "user_id = ?", user.ID).Select("filename", "file_size", "created_at", "location").Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"files": files})
+}
+
 func GetFileByID(c *gin.Context) {
 	var file models.File
 	fileId := c.Param("id")

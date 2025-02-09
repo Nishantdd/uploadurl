@@ -8,6 +8,7 @@ import (
 
 func FileRoutes(r *gin.RouterGroup) {
 	fileGroup := r.Group("/file")
+	fileGroup.GET("/u/:username", controllers.GetFilesByUsername)
 	fileGroup.Use(middleware.ValidateAuth())
 	{
 		fileGroup.GET("/user", controllers.GetFiles)
