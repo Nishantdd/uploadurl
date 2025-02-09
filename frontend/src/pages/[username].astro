@@ -1,0 +1,79 @@
+---
+import { SERVER_ADDRESS } from "astro:env/client";
+import Layout from "@/layouts/Layout.astro";
+import { creationTimeMessageGenerator } from "@/utils";
+import type { fileResponse } from "@/types";
+
+const { username } = Astro.params;
+const isPublic = true; // TODO: Fetch it from database after implementation
+let error = false;
+let files: fileResponse[] = [];
+
+await fetch(`${SERVER_ADDRESS}/api/file/u/${username}`)
+    .then(res => res.json())
+    .then(data => data.error ? error = true : files = data.files)
+    .catch(() => error = true);
+
+if(error) return Astro.redirect("404");
+else files.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+---
+
+<Layout>
+    <div class="min-h-screen bg-background">
+        <main class="container mx-auto px-4 pt-24">
+            {isPublic ? (
+                <div class="space-y-8">
+                    <!-- Profile Header -->
+                    <div class="bg-gray-dark/60 backdrop-blur-lg rounded-xl p-6">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-special/20 flex items-center justify-center text-special text-xl">
+                                {(username as string)[0].toUpperCase()}
+                            </div>
+                            <div>
+                                <h1 class="text-2xl font-bold text-special">{username}'s Files</h1>
+                                <p class="text-normal/70">Public Repository</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Files Section -->
+                    <div class="bg-gray-dark/60 backdrop-blur-lg rounded-xl p-6">
+                        <h2 class="text-xl font-semibold mb-4 special-text">Shared Files</h2>
+                        <div class="space-y-4">
+                            {files.map(file => (
+                                <div class="flex items-center justify-between p-4 bg-background/40 rounded-lg">
+                                    <div class="flex-1">
+                                        <p class="text-normal">{file.filename}</p>
+                                        <p class="text-sm text-normal/70">{(file.file_size / (1024 * 1024)).toFixed(2)} MB • {creationTimeMessageGenerator(file.created_at)}</p>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        {/* TODO: Implement buttons */}
+                                        <button class="p-2 hover:text-special transition-colors">
+                                            <span class="sr-only">Download</span>
+                                            ⬇️
+                                        </button>
+                                        <button class="p-2 hover:text-special transition-colors">
+                                            <span class="sr-only">Share</span>
+                                            🔗
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                <div class="bg-gray-dark/60 backdrop-blur-lg rounded-xl p-12 text-center max-w-2xl mx-auto">
+                    <div class="w-16 h-16 rounded-full bg-special/20 flex items-center justify-center text-special text-2xl mx-auto mb-4">
+                        🔒
+                    </div>
+                    <h2 class="text-2xl font-bold text-special mb-4">This Profile is Private</h2>
+                    <p class="text-normal/70 mb-8">The owner has chosen to keep their files private.</p>
+                    <a href="/" class="inline-block bg-button hover:bg-button-hover text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                        Return Home
+                    </a>
+                </div>
+            )}
+        </main>
+    </div>
+</Layout>
