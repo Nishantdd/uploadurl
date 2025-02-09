@@ -3,27 +3,9 @@ import { SERVER_ADDRESS } from "astro:env/client";
 import Layout from "@/layouts/Layout.astro";
 import FileUploader from "@/components/FileUploader.tsx";
 import UrlShortener from "@/components/UrlShortener.tsx";
+import { creationTimeMessageGenerator } from "@/utils";
 import type { urlResponse, fileResponse } from "@/types"
 const token = Astro.cookies.get('token')?.value || ""
-
-const creationTimeMessageGenerator = (date: string) => {
-    const creation_date = new Date(date)
-    const present_date = Date.now()
-    const difference = (present_date - creation_date.getTime()) / (1000 * 60 * 60 * 24)
-    const seconds = Math.floor(difference * 24 * 60 * 60);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-    const months = Math.floor(days / 30);
-    const years = Math.floor(months / 12);
-
-    if (years > 0) return `Uploaded ${years} year${years > 1 ? 's' : ''} ago`;
-    else if (months > 0) return `Uploaded ${months} month${months > 1 ? 's' : ''} ago`;
-    else if (days > 0) return `Uploaded ${days} day${days > 1 ? 's' : ''} ago`;
-    else if (hours > 0) return `Uploaded ${hours} hour${hours > 1 ? 's' : ''} ago`;
-    else if (minutes > 0) return `Uploaded ${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-    else return "Uploaded just now";
-}
 
 let username = "";
 let urls: urlResponse[] = [];
@@ -44,15 +26,11 @@ try {
 
     if (urlData.urls) {
         urls = urlData.urls;
-        if(urls.length > 0) {
-            urls.sort((a: urlResponse, b: urlResponse) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
-        }
+        urls.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
     }
     if (fileData.files) {
         files = fileData.files;
-        if(files.length > 0) {
-            files.sort((a: fileResponse, b: fileResponse) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
-        }
+        files.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
     }
 } catch {
     return Astro.redirect("500")
