@@ -12,6 +12,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func GetAllFiles(c *gin.Context) {
+	var files []models.File
+	if err := database.DB.Find(&files).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"files": files})
+}
+
 func GetFiles(c *gin.Context) {
 	var files []models.File
 	userId, _ := c.Get("userId")
