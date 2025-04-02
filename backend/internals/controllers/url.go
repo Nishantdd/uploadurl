@@ -64,7 +64,7 @@ func GetAllUrls(c *gin.Context) {
 }
 
 func GetUrls(c *gin.Context) {
-	userId, _ := c.Get("userId")
+	userId := c.GetUint64("userId")
 
 	var urls []models.Url
 	urlRes := database.DB.Find(&urls, "user_id = ?", userId)

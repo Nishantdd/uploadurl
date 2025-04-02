@@ -24,7 +24,7 @@ func GetAllFiles(c *gin.Context) {
 
 func GetFiles(c *gin.Context) {
 	var files []models.File
-	userId, _ := c.Get("userId")
+	userId := c.GetUint64("userId")
 
 	if err := database.DB.Find(&files, "user_id = ?", userId).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -89,11 +89,7 @@ func UploadFile(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	} else {
-		userId, exists := c.Get("userId")
-		if !exists {
-			c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
-			return
-		}
+		userId := c.GetUint64("userId")
 		fileName := path.Base(file.Name())
 		fileStats, _ := file.Stat()
 		fileExt := path.Ext(file.Name())
@@ -104,7 +100,7 @@ func UploadFile(c *gin.Context) {
 			FileType: fileExt,
 			FileSize: fileStats.Size(),
 			Location: location,
-			UserId:   userId.(uint64),
+			UserId:   userId,
 		})
 		if res.Error != nil {
 			s3Client.DeleteFile(fileHash)
