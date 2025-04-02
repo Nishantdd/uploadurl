@@ -2,7 +2,7 @@ package models
 
 type User struct {
 	Model
-	Username string `gorm:"type:varchar(100);unique;not null" json:"username" binding:"required,max=100"`
+	Username string `gorm:"type:varchar(100);unique;not null" json:"username" binding:"required,min=1,max=100"`
 	Email    string `gorm:"type:varchar(50);unique;not null" json:"email" binding:"required,email,max=50"`
 	Password string `gorm:"type:varchar(100);" json:"-" binding:"min=8,max=30"`
 	Fullname string `gorm:"type:varchar(100);" json:"fullname,omitempty" binding:"max=100"`
@@ -13,7 +13,7 @@ type User struct {
 }
 
 type UserRequest struct {
-	Username string `json:"username" binding:"required,max=100"`
+	Username string `json:"username" binding:"required,min=1,max=100"`
 	Email    string `json:"email" binding:"required,email,max=50"`
 	Password string `json:"password" binding:"required,min=8,max=30"`
 	Fullname string `json:"fullname" binding:"max=100"`
@@ -34,4 +34,9 @@ type LoginRequest struct {
 type SignupRequest struct {
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required,min=8,max=30"`
+}
+
+type PasswordRequest struct {
+	OldPassword string `json:"old_password" binding:"required,min=8,max=30"`
+	NewPassword string `json:"new_password" binding:"required,min=8,max=30"`
 }

@@ -10,11 +10,13 @@ func UserRoutes(r *gin.RouterGroup) {
 	userGroup := r.Group("/users")
 	{
 		userGroup.GET("/", controllers.GetUsers)
-		userGroup.GET("/username", middleware.ValidateAuth(), controllers.GetUsername)
-		userGroup.POST("", controllers.CreateUser)
+		userGroup.POST("/", controllers.CreateUser)
 		userGroup.GET("/:id", controllers.GetUserByID)
-		userGroup.PUT("/:id", controllers.UpdateUser)
 		userGroup.DELETE("/:id", controllers.DeleteUser)
+		userGroup.PATCH("/password", middleware.ValidateAuth(), controllers.UpdatePassword)
+		userGroup.PATCH("/username", middleware.ValidateAuth(), controllers.UpdateUsername)
+		userGroup.GET("/username", middleware.ValidateAuth(), controllers.GetUsername)
+		userGroup.GET("/metadata", middleware.ValidateAuth(), controllers.GetUserMetadata)
 	}
 }
 
