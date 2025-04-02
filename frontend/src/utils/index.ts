@@ -1,3 +1,5 @@
+const urlParserRegex = /(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)|(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})?/g;
+
 const creationTimeMessageGenerator = (date: string) => {
     const creation_date = new Date(date)
     const present_date = Date.now()
@@ -17,4 +19,6 @@ const creationTimeMessageGenerator = (date: string) => {
     else return "Uploaded just now";
 }
 
-export { creationTimeMessageGenerator }
+const isValidUrl = (url: string) => urlParserRegex.test(url);
+
+export { creationTimeMessageGenerator, isValidUrl }

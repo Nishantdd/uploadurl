@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { SERVER_ADDRESS } from "astro:env/client"
+import { isValidUrl } from "@/utils";
 
 function UrlShortener({ token }: { token: string }) {
     const [loading, setLoading] = useState(false);
@@ -12,7 +13,13 @@ function UrlShortener({ token }: { token: string }) {
         e.preventDefault();
         setLoading(true);
         setError("");
-        
+
+        if(!isValidUrl(url)) {
+            setError("Please enter a valid URL");
+            setLoading(false);
+            return;
+        }
+
         await fetch(`${SERVER_ADDRESS}/api/url/shorten`, {
             method: "POST",
             headers: { 
