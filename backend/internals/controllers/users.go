@@ -181,9 +181,9 @@ func UpdateUser(c *gin.Context) {
 }
 
 func DeleteUser(c *gin.Context) {
-	id := c.Param("id")
+	userId := c.GetUint64("userId")
 
-	result := database.DB.Delete(&models.User{}, id)
+	result := database.DB.Delete(&models.User{}, userId)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return

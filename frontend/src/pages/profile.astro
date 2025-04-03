@@ -1,7 +1,7 @@
 ---
 import { SERVER_ADDRESS } from "astro:env/client";
 import Layout from "@/layouts/Layout.astro";
-const token = Astro.cookies.get('token')?.value || ""
+const token = Astro.cookies.get("token")?.value || "";
 
 let error = "";
 let success = "";
@@ -13,15 +13,17 @@ const userData = {
 };
 
 try {
-    const res = await fetch(`${SERVER_ADDRESS}/api/users/metadata`, { headers: { "Authorization": token } })
+    const res = await fetch(`${SERVER_ADDRESS}/api/users/metadata`, {
+        headers: { Authorization: token },
+    });
 
     const userMetadata = await res.json();
-    if(userMetadata.error) throw new Error(userMetadata.error)
+    if (userMetadata.error) throw new Error(userMetadata.error);
 
     userData.username = userMetadata.username;
     userData.canChangeUsername = Boolean(userMetadata.username_permission);
     userData.isPublic = Boolean(userMetadata.repository_permission);
-} catch(err) {
+} catch (err) {
     error = err instanceof Error ? err.message : String(err);
 }
 
@@ -37,55 +39,78 @@ if (Astro.request.method === "POST") {
                 sameSite: "strict",
                 path: "/",
             });
-            return Astro.redirect("/")
+            return Astro.redirect("/");
         case "username":
-            const newUsername = formData.get("username")?.toString().trim() || ""
+            const newUsername =
+                formData.get("username")?.toString().trim() || "";
             await fetch(`${SERVER_ADDRESS}/api/users/username`, {
                 method: "PATCH",
-                headers: { 
-                    "Authorization": token,
-                    "Content-Type": "application/json" 
+                headers: {
+                    Authorization: token,
+                    "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    "username": newUsername
-                })
+                    username: newUsername,
+                }),
             })
-                .then(res => res.json())
-                .then(data => {
-                    if(data.error) error = data.error;
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.error) error = data.error;
                     else {
                         success = data.message;
                         userData.username = newUsername;
                     }
                 })
-                .catch(err => error = err.message);
+                .catch((err) => (error = err.message));
             break;
         case "password":
-            const oldPassword = formData.get("currentPassword")?.toString().trim() || ""
-            const newPassword = formData.get("newPassword")?.toString().trim() || ""
+            const oldPassword =
+                formData.get("currentPassword")?.toString().trim() || "";
+            const newPassword =
+                formData.get("newPassword")?.toString().trim() || "";
             await fetch(`${SERVER_ADDRESS}/api/users`, {
                 method: "PATCH",
-                headers: { 
-                    "Authorization": token,
-                    "Content-Type": "application/json" 
+                headers: {
+                    Authorization: token,
+                    "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    "old_password": oldPassword,
-                    "new_password": newPassword
-                })
+                    old_password: oldPassword,
+                    new_password: newPassword,
+                }),
             })
-                .then(res => res.json())
-                .then(data => {
-                    if(data.error) error = data.error;
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.error) error = data.error;
                     else success = data.message;
                 })
-                .catch(err => error = err.message);
+                .catch((err) => (error = err.message));
             break;
         case "visibility":
             // TODO: Feature to be implemented
             break;
         case "delete":
-            // TODO: Handle profile delete logic
+            await fetch(`${SERVER_ADDRESS}/api/users`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: token,
+                    "Content-Type": "application/json",
+                },
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.error) error = data.error;
+                    else {
+                        Astro.cookies.delete("token", {
+                            httpOnly: true,
+                            secure: true,
+                            sameSite: "strict",
+                            path: "/",
+                        });
+                        return Astro.redirect("/");
+                    }
+                })
+                .catch((err) => (error = err.message));
             break;
     }
 }
@@ -170,7 +195,10 @@ if (Astro.request.method === "POST") {
 
         <!-- Privacy Section -->
         <div class="bg-gray-dark/60 backdrop-blur-lg rounded-xl p-6 mb-6">
-            <h2 class="text-xl font-semibold mb-4">Privacy Settings <span class="text-sm text-normal/70 tba">TBA</span></h2>
+            <h2 class="text-xl font-semibold mb-4">
+                Privacy Settings <span class="text-sm text-normal/70 tba"
+                    >TBA</span>
+            </h2>
             <form method="POST" class="space-y-4">
                 <input type="hidden" name="action" value="visibility" />
                 <label class="flex items-center gap-3 cursor-pointer group">

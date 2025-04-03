@@ -12,7 +12,7 @@ func UserRoutes(r *gin.RouterGroup) {
 		userGroup.GET("/", controllers.GetUsers)
 		userGroup.POST("/", controllers.CreateUser)
 		userGroup.GET("/:id", controllers.GetUserByID)
-		userGroup.DELETE("/:id", controllers.DeleteUser)
+		userGroup.DELETE("/", middleware.ValidateAuth(), controllers.DeleteUser)
 		userGroup.PATCH("/password", middleware.ValidateAuth(), controllers.UpdatePassword)
 		userGroup.PATCH("/username", middleware.ValidateAuth(), controllers.UpdateUsername)
 		userGroup.GET("/username", middleware.ValidateAuth(), controllers.GetUsername)
