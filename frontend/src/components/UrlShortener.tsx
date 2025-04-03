@@ -60,7 +60,7 @@ function UrlShortener({ token }: { token: string }) {
                             </button>
                         )}
                     </div>
-                    <button type="submit" className="flex items-center justify-center gap-2 text-white font-medium px-6 py-2 rounded-lg bg-[#504945] hover:bg-[#3c3836] transition-colors">
+                    <button type="submit" className="flex items-center justify-center gap-2 text-white font-medium px-6 py-2 rounded-lg bg-[#6f6f6f] hover:bg-[#494949] transition-colors">
                         {loading && <span className="loader"></span>}
                         Shorten
                     </button>

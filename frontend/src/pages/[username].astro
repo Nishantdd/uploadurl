@@ -1,5 +1,6 @@
 ---
 import { SERVER_ADDRESS } from "astro:env/client";
+import { Icon } from "astro-icon/components";
 import Layout from "@/layouts/Layout.astro";
 import { creationTimeMessageGenerator } from "@/utils";
 import type { fileResponse } from "@/types";
@@ -49,12 +50,14 @@ else files.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_
                                     <div class="flex gap-2">
                                         {/* TODO: Implement buttons */}
                                         <button class="p-2 hover:text-special transition-colors">
-                                            <span class="sr-only">Download</span>
-                                            ⬇️
+                                            <span class="sr-only">
+                                                Download
+                                            </span>
+                                            <Icon name="line-md:download-twotone" size={24} />
                                         </button>
                                         <button class="p-2 hover:text-special transition-colors">
                                             <span class="sr-only">Share</span>
-                                            🔗
+                                            <Icon name="tabler:share" size={20}/>
                                         </button>
                                     </div>
                                 </div>
@@ -65,7 +68,7 @@ else files.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_
             ) : (
                 <div class="bg-gray-dark/60 backdrop-blur-lg rounded-xl p-12 text-center max-w-2xl mx-auto">
                     <div class="w-16 h-16 rounded-full bg-special/20 flex items-center justify-center text-special text-2xl mx-auto mb-4">
-                        🔒
+                        <Icon name="ic:twotone-lock" size={24} />
                     </div>
                     <h2 class="text-2xl font-bold text-special mb-4">This Profile is Private</h2>
                     <p class="text-normal/70 mb-8">The owner has chosen to keep their files private.</p>

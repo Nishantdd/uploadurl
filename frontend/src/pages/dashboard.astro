@@ -1,5 +1,6 @@
 ---
 import { SERVER_ADDRESS } from "astro:env/client";
+import { Icon } from 'astro-icon/components';
 import Layout from "@/layouts/Layout.astro";
 import FileUploader from "@/components/FileUploader.tsx";
 import UrlShortener from "@/components/UrlShortener.tsx";
@@ -119,11 +120,11 @@ try {
                                     <div class="flex gap-2">
                                         <button class="p-2 hover:text-special transition-colors">
                                             <span class="sr-only">Copy</span> {/* TODO: Implement copy button for url*/}
-                                            📋
+                                            <Icon name="duo-icons:clipboard" size={22} />
                                         </button>
                                         <button class="p-2 hover:text-special transition-colors">
                                             <span class="sr-only">Delete</span> {/* TODO: Implement delete button for url*/}
-                                            🗑️
+                                            <Icon name="ic:twotone-delete" size={22} />
                                         </button>
                                     </div>
                                 </div>
@@ -160,15 +161,15 @@ try {
                                             <span class="sr-only">
                                                 Download
                                             </span>
-                                            ⬇️
+                                            <Icon name="line-md:download-twotone" size={24} />
                                         </button>
                                         <button class="p-2 hover:text-special transition-colors">
                                             <span class="sr-only">Share</span>
-                                            🔗
+                                            <Icon name="tabler:share" size={20}/>
                                         </button>
                                         <button class="p-2 hover:text-special transition-colors">
                                             <span class="sr-only">Delete</span>
-                                            🗑️
+                                            <Icon name="ic:twotone-delete" size={22} />
                                         </button>
                                     </div>
                                 </div>
