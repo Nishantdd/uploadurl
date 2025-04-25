@@ -48,14 +48,18 @@ else files.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_
                                         <p class="text-sm text-normal/70">{(file.file_size / (1024 * 1024)).toFixed(2)} MB • {creationTimeMessageGenerator(file.created_at)}</p>
                                     </div>
                                     <div class="flex gap-2">
-                                        {/* TODO: Implement buttons */}
-                                        <button class="p-2 hover:text-special transition-colors">
-                                            <span class="sr-only">
-                                                Download
-                                            </span>
-                                            <Icon name="line-md:download-twotone" size={24} />
-                                        </button>
-                                        <button class="p-2 hover:text-special transition-colors">
+                                        <a href={file.location} download={file.filename}>
+                                            <button class="p-2 hover:text-special transition-colors active:scale-90">
+                                                <span class="sr-only">
+                                                    Download
+                                                </span>
+                                                <Icon name="line-md:download-twotone" size={24} />
+                                            </button>
+                                        </a>
+                                        <button
+                                            onclick={`navigator.clipboard.writeText('${file.location}')`}
+                                            class="p-2 hover:text-special transition-colors active:scale-90"
+                                        >
                                             <span class="sr-only">Share</span>
                                             <Icon name="tabler:share" size={20}/>
                                         </button>
