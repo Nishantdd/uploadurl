@@ -118,11 +118,14 @@ try {
                                         </p>
                                     </div>
                                     <div class="flex gap-2">
-                                        <button class="p-2 hover:text-special transition-colors">
-                                            <span class="sr-only">Copy</span> {/* TODO: Implement copy button for url*/}
+                                        <button
+                                            onclick={`navigator.clipboard.writeText('${url.short_url}')`}
+                                            class="p-2 hover:text-special transition-colors active:scale-90"
+                                        >
+                                            <span class="sr-only">Copy</span>
                                             <Icon name="duo-icons:clipboard" size={22} />
                                         </button>
-                                        <button class="p-2 hover:text-special transition-colors">
+                                        <button class="p-2 hover:text-special transition-colors active:scale-90">
                                             <span class="sr-only">Delete</span> {/* TODO: Implement delete button for url*/}
                                             <Icon name="ic:twotone-delete" size={22} />
                                         </button>
@@ -156,18 +159,23 @@ try {
                                         </p>
                                     </div>
                                     <div class="flex gap-2">
-                                        {/* TODO: Implement the file buttons */}
-                                        <button class="p-2 hover:text-special transition-colors">
-                                            <span class="sr-only">
-                                                Download
-                                            </span>
-                                            <Icon name="line-md:download-twotone" size={24} />
-                                        </button>
-                                        <button class="p-2 hover:text-special transition-colors">
+                                        {/* TODO: Implement the file delete button */}
+                                        <a href={file.location} download={file.filename}>
+                                            <button class="p-2 hover:text-special transition-colors active:scale-90">
+                                                <span class="sr-only">
+                                                    Download
+                                                </span>
+                                                <Icon name="line-md:download-twotone" size={24} />
+                                            </button>
+                                        </a>
+                                        <button 
+                                            onclick={`navigator.clipboard.writeText('${file.location}')`}
+                                            class="p-2 hover:text-special transition-colors active:scale-90"
+                                        >
                                             <span class="sr-only">Share</span>
                                             <Icon name="tabler:share" size={20}/>
                                         </button>
-                                        <button class="p-2 hover:text-special transition-colors">
+                                        <button class="p-2 hover:text-special transition-colors active:scale-90">
                                             <span class="sr-only">Delete</span>
                                             <Icon name="ic:twotone-delete" size={22} />
                                         </button>
