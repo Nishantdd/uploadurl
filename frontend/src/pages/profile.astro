@@ -1,0 +1,263 @@
+---
+import { SERVER_ADDRESS } from "astro:env/client";
+import Layout from "@/layouts/Layout.astro";
+const token = Astro.cookies.get("token")?.value || "";
+
+let error = "";
+let success = "";
+
+const userData = {
+    username: "",
+    canChangeUsername: false,
+    isPublic: true,
+};
+
+try {
+    const res = await fetch(`${SERVER_ADDRESS}/api/users/metadata`, {
+        headers: { Authorization: token },
+    });
+
+    const userMetadata = await res.json();
+    if (userMetadata.error) throw new Error(userMetadata.error);
+
+    userData.username = userMetadata.username;
+    userData.canChangeUsername = Boolean(userMetadata.username_permission);
+    userData.isPublic = Boolean(userMetadata.repository_permission);
+} catch (err) {
+    error = err instanceof Error ? err.message : String(err);
+}
+
+if (Astro.request.method === "POST") {
+    const formData = await Astro.request.formData();
+    const action = formData.get("action");
+
+    switch (action) {
+        case "logout":
+            Astro.cookies.delete("token", {
+                httpOnly: true,
+                secure: true,
+                sameSite: "strict",
+                path: "/",
+            });
+            return Astro.redirect("/");
+        case "username":
+            const newUsername =
+                formData.get("username")?.toString().trim() || "";
+            await fetch(`${SERVER_ADDRESS}/api/users/username`, {
+                method: "PATCH",
+                headers: {
+                    Authorization: token,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username: newUsername,
+                }),
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.error) error = data.error;
+                    else {
+                        success = data.message;
+                        userData.username = newUsername;
+                    }
+                })
+                .catch((err) => (error = err.message));
+            break;
+        case "password":
+            const oldPassword =
+                formData.get("currentPassword")?.toString().trim() || "";
+            const newPassword =
+                formData.get("newPassword")?.toString().trim() || "";
+            await fetch(`${SERVER_ADDRESS}/api/users`, {
+                method: "PATCH",
+                headers: {
+                    Authorization: token,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    old_password: oldPassword,
+                    new_password: newPassword,
+                }),
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.error) error = data.error;
+                    else success = data.message;
+                })
+                .catch((err) => (error = err.message));
+            break;
+        case "visibility":
+            // TODO: Feature to be implemented
+            break;
+        case "delete":
+            await fetch(`${SERVER_ADDRESS}/api/users`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: token,
+                    "Content-Type": "application/json",
+                },
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.error) error = data.error;
+                    else {
+                        Astro.cookies.delete("token", {
+                            httpOnly: true,
+                            secure: true,
+                            sameSite: "strict",
+                            path: "/",
+                        });
+                        return Astro.redirect("/");
+                    }
+                })
+                .catch((err) => (error = err.message));
+            break;
+    }
+}
+---
+
+<Layout>
+    <main class="container mx-auto px-4 pt-24 pb-12 max-w-2xl">
+        <div class="flex items-center justify-between">
+            <h1 class="text-3xl font-bold special-text mb-8">
+                Profile Settings
+            </h1>
+            <!-- Put outside form to not mess up the mb-auto -->
+            <button
+                class="mb-auto px-6 py-2 rounded bg-error/10 text-error border border-error/20 hover:bg-error/20 transition-colors"
+                onclick="document.getElementById('logout-form').submit();"
+            >
+                Log Out
+            </button>
+            <form id="logout-form" method="POST" style="display: none;">
+                <input type="hidden" name="action" value="logout" />
+            </form>
+        </div>
+
+        {error && <p class="text-error mb-4">{error}</p>}
+        {success && <p class="text-green-500 mb-4">{success}</p>}
+
+        <!-- Username Section -->
+        <div class="bg-gray-dark/60 backdrop-blur-lg rounded-xl p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Username</h2>
+            <form method="POST" class="space-y-4">
+                <input type="hidden" name="action" value="username" />
+                <div class="flex gap-4">
+                    <input
+                        type="text"
+                        name="username"
+                        value={userData.username}
+                        class="flex-1 p-3 rounded bg-background border border-normal/20 text-normal focus:border-special outline-none"
+                        disabled={!userData.canChangeUsername}
+                    />
+                    <button
+                        type="submit"
+                        class="bg-button px-6 py-2 rounded text-white font-medium hover:bg-button-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={!userData.canChangeUsername}
+                    >
+                        Update
+                    </button>
+                </div>
+                <p class="text-sm text-normal/70">
+                    Username can only be changed once every 30 days.
+                </p>
+            </form>
+        </div>
+
+        <!-- Password Section -->
+        <div class="bg-gray-dark/60 backdrop-blur-lg rounded-xl p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Change Password</h2>
+            <form method="POST" class="space-y-4">
+                <input type="hidden" name="action" value="password" />
+                <input
+                    type="password"
+                    name="currentPassword"
+                    placeholder="Current Password"
+                    class="w-full p-3 rounded bg-background border border-normal/20 text-normal focus:border-special outline-none"
+                    required
+                />
+                <input
+                    type="password"
+                    name="newPassword"
+                    placeholder="New Password"
+                    class="w-full p-3 rounded bg-background border border-normal/20 text-normal focus:border-special outline-none"
+                    required
+                    minlength="8"
+                />
+                <button
+                    type="submit"
+                    class="bg-button w-full p-3 rounded text-white font-medium hover:bg-button-hover transition-colors"
+                >
+                    Update Password
+                </button>
+            </form>
+        </div>
+
+        <!-- Privacy Section -->
+        <div class="bg-gray-dark/60 backdrop-blur-lg rounded-xl p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">
+                Privacy Settings <span class="text-sm text-normal/70 tba"
+                    >TBA</span>
+            </h2>
+            <form method="POST" class="space-y-4">
+                <input type="hidden" name="action" value="visibility" />
+                <label class="flex items-center gap-3 cursor-pointer group">
+                    <div class="relative w-5 h-5">
+                        <input
+                            type="checkbox"
+                            name="isPublic"
+                            checked={userData.isPublic}
+                            disabled={true}
+                            class="peer sr-only"
+                        />
+                        <div
+                            class="absolute inset-0 border-2 border-normal/20 rounded transition-colors peer-checked:border-button peer-checked:bg-[#4c2924] peer-disabled:bg-background peer-disabled:border-normal"
+                        >
+                        </div>
+                        <svg
+                            class="absolute inset-0 w-5 h-5 text-white opacity-0 peer-checked:opacity-100 transition-opacity"
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                d="M4 10l4 4 8-8"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"></path>
+                        </svg>
+                    </div>
+                    <span>Make my dashboard public</span>
+                </label>
+                <p class="text-sm text-normal/70">
+                    When enabled, anyone can view your shared files and URLs.
+                </p>
+                <button
+                    type="submit"
+                    class="bg-button w-full p-3 rounded text-white font-medium hover:bg-button-hover transition-colors"
+                >
+                    Save Privacy Settings
+                </button>
+            </form>
+        </div>
+
+        <!-- Delete Account Section -->
+        <div class="bg-gray-dark/60 backdrop-blur-lg rounded-xl p-6">
+            <h2 class="text-xl font-semibold mb-4 text-error">Danger Zone</h2>
+            <form method="POST" class="space-y-4">
+                <input type="hidden" name="action" value="delete" />
+                <p class="text-normal/70">
+                    Once you delete your account, there is no going back. Please
+                    be certain.
+                </p>
+                <button
+                    type="submit"
+                    class="w-full p-3 rounded bg-error/10 text-error border border-error/20 hover:bg-error/20 transition-colors"
+                    onclick="return confirm('Are you sure you want to delete your account? This action cannot be undone.')"
+                >
+                    Delete Account
+                </button>
+            </form>
+        </div>
+    </main>
+</Layout>

@@ -1,8 +1,16 @@
 package routes
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 func HandleRoutes(router *gin.Engine) {
-	apiGroup := router.Group("/api")
-	UserRoutes(apiGroup)
+	// unprotected routes
+	AuthRoutes(router)
+
+	Group := router.Group("/api")
+	UserRoutes(Group)
+	UserRoutesAuth(Group)
+	UrlRoutes(Group)
+	FileRoutes(Group)
 }

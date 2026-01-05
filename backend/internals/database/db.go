@@ -23,7 +23,7 @@ func SetupConnection() *gorm.DB {
 	}
 
 	// migrating Models/Schemas
-	if err := db.AutoMigrate(&models.User{}, &models.Url{}, &models.Slug{}, &models.Files{}); err != nil {
+	if err := db.AutoMigrate(&models.User{}, &models.Url{}, &models.Slug{}, &models.File{}, &models.Token{}, &models.UrlHits{}); err != nil {
 		log.Fatalln("Failed to migrate database:", err)
 	}
 

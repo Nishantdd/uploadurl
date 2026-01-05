@@ -1,0 +1,229 @@
+---
+import { SERVER_ADDRESS } from "astro:env/client";
+import { Icon } from 'astro-icon/components';
+import Layout from "@/layouts/Layout.astro";
+import FileUploader from "@/components/FileUploader.tsx";
+import UrlShortener from "@/components/UrlShortener.tsx";
+import { creationTimeMessageGenerator } from "@/utils";
+import type { urlResponse, fileResponse } from "@/types"
+const token = Astro.cookies.get('token')?.value || ""
+
+let username = "";
+let urls: urlResponse[] = [];
+let files: fileResponse[] = [];
+try {
+    const [usernameRes, urlRes, fileRes] = await Promise.all([
+        fetch(`${SERVER_ADDRESS}/api/users/username`, { headers: { "Authorization": token } }),
+        fetch(`${SERVER_ADDRESS}/api/url/user`, { headers: { "Authorization": token } }),
+        fetch(`${SERVER_ADDRESS}/api/file/user`, { headers: { "Authorization": token } })
+    ]);
+
+    const usernameData = await usernameRes.json();
+    const urlData = await urlRes.json();
+    const fileData = await fileRes.json();
+
+    if (usernameData.error) return Astro.redirect("500");
+    else username = usernameData.username;
+
+    if (urlData.urls) {
+        urls = urlData.urls;
+        urls.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+    }
+    if (fileData.files) {
+        files = fileData.files;
+        files.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+    }
+} catch {
+    return Astro.redirect("500")
+}
+---
+
+<Layout>
+    <!-- Dashboard Container -->
+    <main class="container mx-auto px-4 pt-24">
+        <!-- User Profile Section -->
+        <div class="bg-gray-dark/60 backdrop-blur-lg rounded-xl p-6 mb-8">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <div class="relative group">
+                        <input
+                            type="text"
+                            id="userurl"
+                            value={`uploadurl.com/${username}`}
+                            class="bg-background/40 py-2 px-4 rounded-lg text-normal border border-normal/20 pr-20"
+                            readonly
+                        />
+                        <button
+                            class="absolute right-2 top-1/2 -translate-y-1/2 text-sm bg-button hover:bg-button-hover text-white px-3 py-1 rounded transition-colors"
+                            id="copyButton"
+                        >
+                            Copy
+                        </button>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-normal">Welcome back, {username}!</span>
+                    <div
+                        class="w-10 h-10 rounded-full bg-special/20 flex items-center justify-center text-special"
+                    >
+                        {username[0].toUpperCase()}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs Section -->
+        <div class="mb-8">
+            <div class="flex gap-2" role="tablist">
+                <button
+                    class="tab-button px-6 py-3 rounded-lg font-medium transition-colors data-[active=true]:bg-button data-[active=true]:text-white data-[active=false]:border data-[active=false]:border-normal"
+                    data-active="true"
+                    data-tab="urls"
+                >
+                    URLs
+                </button>
+                <button
+                    class="tab-button px-6 py-3 rounded-lg font-medium transition-colors data-[active=true]:bg-button data-[active=true]:text-white data-[active=false]:border data-[active=false]:border-normal"
+                    data-active="false"
+                    data-tab="files"
+                >
+                    Files
+                </button>
+            </div>
+        </div>
+
+        <!-- Content Sections -->
+        <div class="space-y-6">
+            <!-- URLs Section -->
+            <div class="tab-content" data-tab="urls">
+                <UrlShortener token={token} client:load/>
+
+                <!-- URL List -->
+                <div
+                    class="mt-8 bg-gray-dark/60 backdrop-blur-lg rounded-xl p-6"
+                >
+                    <h3 class="text-xl font-semibold mb-4 special-text">
+                        Your Shortened URLs
+                    </h3>
+                    <div class="space-y-4">
+                        {
+                            urls.map(url => (
+                                <div class="flex items-center justify-between p-4 bg-background/40 rounded-lg">
+                                    <div class="flex-1">
+                                        <p class="text-normal truncate">
+                                            {url.original_url}
+                                        </p>
+                                        <p class="text-sm text-special">
+                                            {url.short_url}
+                                        </p>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button
+                                            onclick={`navigator.clipboard.writeText('${url.short_url}')`}
+                                            class="p-2 hover:text-special transition-colors active:scale-90"
+                                        >
+                                            <span class="sr-only">Copy</span>
+                                            <Icon name="duo-icons:clipboard" size={22} />
+                                        </button>
+                                        <button class="p-2 hover:text-special transition-colors active:scale-90">
+                                            <span class="sr-only">Delete</span> {/* TODO: Implement delete button for url*/}
+                                            <Icon name="ic:twotone-delete" size={22} />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Files Section -->
+            <div class="tab-content hidden" data-tab="files">
+                <FileUploader token={token} client:load/>
+
+                <!-- File List -->
+                <div
+                    class="mt-8 bg-gray-dark/60 backdrop-blur-lg rounded-xl p-6"
+                >
+                    <h3 class="text-xl font-semibold mb-4 special-text">
+                        Your Uploaded Files
+                    </h3>
+                    <div class="space-y-4">
+                        {
+                            files.map(file => (
+                                <div class="flex items-center justify-between p-4 bg-background/40 rounded-lg">
+                                    <div class="flex-1">
+                                        <p class="text-normal">{file.filename}</p>
+                                        <p class="text-sm text-normal/70">
+                                            {(file.file_size / (1024 * 1024)).toFixed(2)} MB • {creationTimeMessageGenerator(file.created_at)}
+                                        </p>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        {/* TODO: Implement the file delete button */}
+                                        <a href={file.location} download={file.filename}>
+                                            <button class="p-2 hover:text-special transition-colors active:scale-90">
+                                                <span class="sr-only">
+                                                    Download
+                                                </span>
+                                                <Icon name="line-md:download-twotone" size={24} />
+                                            </button>
+                                        </a>
+                                        <button 
+                                            onclick={`navigator.clipboard.writeText('${file.location}')`}
+                                            class="p-2 hover:text-special transition-colors active:scale-90"
+                                        >
+                                            <span class="sr-only">Share</span>
+                                            <Icon name="tabler:share" size={20}/>
+                                        </button>
+                                        <button class="p-2 hover:text-special transition-colors active:scale-90">
+                                            <span class="sr-only">Delete</span>
+                                            <Icon name="ic:twotone-delete" size={22} />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</Layout>
+
+<script>
+    // Tab switching logic
+    const tabButtons = document.querySelectorAll(".tab-button");
+    const tabContents = document.querySelectorAll(".tab-content");
+
+    tabButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const tab = (button as HTMLElement).dataset.tab;
+
+            // Update button states
+            tabButtons.forEach((btn) => {
+                (btn as HTMLElement).dataset.active = (
+                    btn === button
+                ).toString();
+            });
+
+            // Update content visibility
+            tabContents.forEach((content) => {
+                content.classList.toggle(
+                    "hidden",
+                    (content as HTMLElement).dataset.tab !== tab
+                );
+            });
+        });
+    });
+
+    // Copy user url logic
+    const copyButton = document.getElementById("copyButton");
+    copyButton?.addEventListener("click", () => {
+        const url = (document.getElementById("userurl") as HTMLInputElement).value;
+        navigator.clipboard.writeText(url);
+        copyButton.textContent = "Copied!";
+        setTimeout(() => {
+            copyButton.textContent = "Copy";
+        }, 2000);
+    });
+</script>

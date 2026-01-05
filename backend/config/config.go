@@ -12,10 +12,12 @@ type Config struct {
 	Redis    RedisConfig
 	AWS      AWSConfig
 	JWT      JWTConfig
+	OAuth    OAuthConfig
 }
 
 type ServerConfig struct {
-	Address string
+	ServerAddress string
+	DomainAddress string
 }
 
 type PostgresConfig struct {
@@ -38,10 +40,17 @@ type JWTConfig struct {
 	JWTSecret string
 }
 
+type OAuthConfig struct {
+	GoogleClientID     string
+	GoogleClientSecret string
+	RedirectURL        string
+}
+
 func Load() *Config {
 	return &Config{
 		Server: ServerConfig{
-			Address: os.Getenv("SERVER_ADDRESS"),
+			ServerAddress: os.Getenv("SERVER_ADDRESS"),
+			DomainAddress: os.Getenv("DOMAIN_ADDRESS"),
 		},
 		Postgres: PostgresConfig{
 			URI: os.Getenv("DATABASE_URL"),
@@ -51,13 +60,18 @@ func Load() *Config {
 			Password: os.Getenv("REDIS_PASSWORD"),
 		},
 		AWS: AWSConfig{
-			S3BucketName: os.Getenv("S3_BUCKET"),
+			S3BucketName: os.Getenv("S3_BUCKET_NAME"),
 			Region:       os.Getenv("AWS_REGION"),
 			AccessKey:    os.Getenv("AWS_ACCESS_KEY"),
 			SecretKey:    os.Getenv("AWS_SECRET_KEY"),
 		},
 		JWT: JWTConfig{
 			JWTSecret: os.Getenv("JWT_SECRET"),
+		},
+		OAuth: OAuthConfig{
+			GoogleClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
+			GoogleClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+			RedirectURL:        os.Getenv("REDIRECT_URL"),
 		},
 	}
 }

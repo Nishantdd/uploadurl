@@ -9,3 +9,6 @@
 # jetbrains/vscode setting folder
 .idea/
 .vscode/
+
+# google console credentials
+google-client-id.json

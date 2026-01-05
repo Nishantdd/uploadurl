@@ -1,18 +1,131 @@
 ---
-import Layout from '@/layouts/Layout.astro';
-import Header from '@/components/Header.astro';
-import UrlShortener from '@/components/UrlShortener.astro';
-import FileUploader from '@/components/FileUploader.astro';
+import Layout from "@/layouts/Layout.astro";
+import UrlShortener from "@/components/UrlShortener.tsx";
+const token = Astro.cookies.get('token')?.value || ""
 ---
 
 <Layout>
-    <main class="min-h-screen">
-        <div class="container mx-auto px-56">
-			<Header />
-			<div class="container mx-auto px-24 py-10 space-y-10">
-				<UrlShortener />
-				<FileUploader />
-			</div>
+    <main>
+        <!-- Hero Section -->
+        <div class="container mx-auto px-4 py-20 mt-12">
+            <div class="max-w-4xl mx-auto text-center space-y-6">
+                <h1 class="text-5xl md:text-6xl font-bold special-text">
+                    Share Files & URLs
+                    <span class="block mt-2">With Style</span>
+                </h1>
+                <p class="text-xl text-normal/80 max-w-2xl mx-auto">
+                    The simplest way to share your files and shorten URLs. Fast,
+                    secure, and completely free.
+                </p>
+                <div class="flex gap-4 justify-center">
+                    <a
+                        href="/sign-up"
+                        class="bg-button hover:bg-button-hover text-white px-8 py-3 rounded-lg font-medium transition-colors"
+                    >
+                        Get Started
+                    </a>
+                    <a
+                        href="#features"
+                        class="border border-normal/20 hover:border-special px-8 py-3 rounded-lg font-medium transition-colors"
+                    >
+                        Learn More
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- URL Shortener Preview -->
+        <div class="container mx-auto px-4 py-12">
+            <div class="max-w-3xl mx-auto">
+                <UrlShortener token={token} client:load />
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="bg-gray-dark py-16">
+            <div class="container mx-auto px-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                    {
+                        [
+                            { number: "1M+", label: "Links Shortened" },
+                            { number: "500K+", label: "Files Shared" },
+                            { number: "100K+", label: "Happy Users" },
+                        ].map((stat) => (
+                            <div class="space-y-2">
+                                <div class="text-4xl font-bold text-special">
+                                    {stat.number}
+                                </div>
+                                <div class="text-normal/70">{stat.label}</div>
+                            </div>
+                        ))
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div id="features" class="container mx-auto px-4 py-20">
+            <h2 class="text-3xl font-bold text-center special-text mb-12">
+                Why Choose Us?
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {
+                    [
+                        {
+                            icon: "🚀",
+                            title: "Lightning Fast",
+                            description:
+                                "Upload files and shorten URLs in seconds",
+                        },
+                        {
+                            icon: "🔒",
+                            title: "Secure Sharing",
+                            description: "End-to-end encryption for your files",
+                        },
+                        {
+                            icon: "📊",
+                            title: "Detailed Analytics",
+                            description: "Track your links and file downloads",
+                        },
+                    ].map((feature) => (
+                        <div class="bg-gray-dark p-6 rounded-xl">
+                            <div class="text-4xl mb-4">{feature.icon}</div>
+                            <h3 class="text-xl font-semibold mb-2 text-special">
+                                {feature.title}
+                            </h3>
+                            <p class="text-normal/70">{feature.description}</p>
+                        </div>
+                    ))
+                }
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="bg-gray-dark py-20">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl font-bold special-text mb-6">
+                    Ready to Get Started?
+                </h2>
+                <p class="text-normal/70 mb-8 max-w-2xl mx-auto">
+                    Join thousands of users who trust us for their file sharing
+                    and URL shortening needs.
+                </p>
+                <a
+                    href="/sign-up"
+                    class="inline-block bg-button hover:bg-button-hover text-white px-8 py-3 rounded-lg font-medium transition-colors"
+                >
+                    Create Free Account
+                </a>
+            </div>
         </div>
     </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-normal/10 py-8">
+        <div class="container mx-auto px-4 text-center text-normal/50">
+            <p>
+                &copy; {new Date().getFullYear()} uploadURL. All rights reserved.
+            </p>
+        </div>
+    </footer>
 </Layout>

@@ -1,13 +1,12 @@
 package models
 
-type Files struct {
+type File struct {
 	Model
-	FileName string `gorm:"type:varchar(50);not null" json:"filename" binding:"required,min=1,max=50"`
+	FileName string `gorm:"type:varchar(100);not null" json:"filename" binding:"required,min=1,max=100"`
 	FileHash string `gorm:"type:varchar(64);not null;unique" json:"filehash"`
 	FileType string `gorm:"type:varchar(20);not null" json:"file_type"`
 	FileSize int64  `gorm:"not null" json:"file_size"`
-	UrlId    uint64 `gorm:"not null" json:"url_id"`
-	UserId   uint64 `gorm:"not null" json:"user_id"`
-	User     User   `gorm:"foreignKey:UserId" json:"-"`
-	Url      Url    `gorm:"foreignKey:UrlId" json:"-"`
+	Location string `gorm:"not null" json:"location"`
+	UserId   uint64 `gorm:"index" json:"user_id"`
+	User     User   `gorm:"foreignKey:UserId;constraint:OnDelete:SET NULL;" json:"-"`
 }

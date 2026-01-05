@@ -1,0 +1,112 @@
+---
+export const prerender = false
+import Layout from '@/layouts/Layout.astro';
+import { SERVER_ADDRESS } from "astro:env/client";
+
+let error = ""
+
+if(Astro.request.method === "POST") {
+    error = ""
+    const formData = await Astro.request.formData();
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    await fetch(`${SERVER_ADDRESS}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+    })
+        .then(res => res.json())
+        .then(data => {
+            if(data.token){
+                Astro.cookies.set("token", data.token, {
+                    httpOnly: true,
+                    secure: true,
+                    sameSite: "strict",
+                    path: "/",
+                    maxAge: 60 * 60 * 24 * 30 // 30 days
+                });
+            } else {
+                error = data.error;
+            }
+        })
+        .catch(err => error = "Request failed, please try again");
+
+    if(!error) return Astro.redirect("/dashboard")
+}
+---
+
+<Layout header={false}>
+    <div class="min-h-screen w-full flex items-center justify-center relative">
+        <!-- Gradient Background -->
+        <div class="absolute inset-0 overflow-hidden -z-10">
+            <div class="absolute top-[-10%] left-[-20%] w-[600px] h-[600px] rounded-full bg-special/10 blur-[100px]"></div>
+            <div class="absolute bottom-[-10%] right-[-20%] w-[600px] h-[600px] rounded-full bg-button/10 blur-[100px]"></div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="w-full max-w-md p-4 animate-fade-in">
+            <div class="bg-gray-dark/60 backdrop-blur-lg rounded-2xl p-1">
+                <div class="bg-background/40 rounded-xl">
+                    <div class="p-8">
+                        <!-- Back Button -->
+                        <a href="/" class="inline-flex items-center text-normal/70 hover:text-special mb-6 transition-colors">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                            </svg>
+                            Back to Home
+                        </a>
+                    
+                        <h2 class="text-2xl font-bold mb-6 special-text">Sign In</h2>
+                        <p class="text-sm text-error mb-4">{error}</p>
+                        
+                        <form method="POST" class="space-y-4">
+                            <input
+                                type="email"
+                                name="email"
+                                placeholder="Email"
+                                class="w-full p-3 rounded bg-background border border-normal/20 text-normal focus:border-special outline-none"
+                                required
+                            />
+                            <input
+                                type="password"
+                                name="password"
+                                placeholder="Password"
+                                class="w-full p-3 rounded bg-background border border-normal/20 text-normal focus:border-special outline-none"
+                                required
+                                minlength="8"
+                            />
+                    
+                            <button
+                                id="submit"
+                                type="submit"
+                                class="w-full bg-button p-3 rounded text-white font-medium hover:bg-button-hover transition-colors"
+                            >
+                                Sign In
+                            </button>
+                    
+                            <div class="flex items-center gap-2 text-normal/50 my-6">
+                                <hr class="flex-1 border-normal/20" />
+                                <span>or</span>
+                                <hr class="flex-1 border-normal/20" />
+                            </div>
+                    
+                            <!-- Google Button -->
+                            <a href={`${SERVER_ADDRESS}/googlelogin`}>
+                                <button
+                                    type="button"
+                                    class="w-full flex items-center justify-center gap-2 p-3 mt-6 bg-background border border-normal/20 rounded hover:border-special transition-colors"
+                                >
+                                    <svg class="w-5 h-5" viewBox="0 0 24 24">
+                                        <path fill="currentColor" d="M12 0C5.372 0 0 5.373 0 12s5.372 12 12 12c6.627 0 12-5.373 12-12S18.627 0 12 0zm.14 19.018c-3.868 0-7-3.14-7-7.018c0-3.878 3.132-7.018 7-7.018c1.89 0 3.47.697 4.682 1.829l-1.974 1.978v-.004c-.735-.702-1.667-1.062-2.708-1.062c-2.31 0-4.187 1.956-4.187 4.273c0 2.315 1.877 4.277 4.187 4.277c2.096 0 3.522-1.202 3.816-2.852H12.14v-2.737h6.585c.088.47.135.96.135 1.474c0 4.01-2.677 6.86-6.72 6.86z"/>
+                                    </svg>
+                                    Continue with Google
+                                </button>
+                            </a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</Layout>
